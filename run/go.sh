@@ -27,10 +27,15 @@ rm -rf $tmp
 
 cd ~
 
-echo $SHELL
+current_shell=$(basename $SHELL)
+if [[ "$current_shell "==" fish" ]]; then
+    set -x GOROOT /usr/local/go
+    set -x PATH $GOROOT/bin $PATH
+elif [[ "$current_shell "==" zsh" || "$current_shell "==" bash" ]]; then
+    export GOROOT=/usr/local/go
+    export PATH=$GOROOT/bin:$PATH
+fi
 
-export GOROOT=/usr/local/go
-export PATH=$GOROOT/bin:$PATH
 
 version=$(go version)
 if [[ $version == *"$release"* ]]; then
