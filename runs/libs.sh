@@ -32,4 +32,4 @@ $HOME/Personal/fzf/install
 # Convenience
 
 sudo apt -y install plocate
-cargo install gping navi tealdeer tokei yazi-cli
+cargo install gping navi tealdeer tokei yazi-cli zoxide
