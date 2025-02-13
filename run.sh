@@ -4,6 +4,7 @@
 # Usage:
 #
 #	DEV_ENV=~/Personal/dev ./run.sh --dry
+#	DEV_ENV=~/Personal/dev ./run.sh docker --dry
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )";
 
@@ -44,6 +45,7 @@ log "RUN: env: $env -- grep: $grep";
 runs_dir=$(find $script_dir/runs -mindepth 1 -maxdepth 1 -executable);
 
 for s in $runs_dir; do
+	# FIXME: Use more strict grepping
 	if echo "$s" | grep -vq "$grep"; then
 		log "grep \"$grep\" filtered out $s";
 		continue;
