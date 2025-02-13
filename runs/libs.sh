@@ -9,13 +9,15 @@ sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip
 
 # Convenience =================================================================
 
-sudo apt -y install lnav plocate
+sudo apt -y install entr lnav plocate
 cargo install gping navi tealdeer tokei yazi-cli zoxide
 
 #  yazi additional dependencies:
 #
 #     `sudo apt -y install ffmpeg 7zip jq poppler-utils fd-find ripgrep fzf zoxide imagemagick`
 cargo install --locked yazi-fm yazi-cli
+
+go install github.com/air-verse/air@latest
 # -----------------------------------------------------------------------------
 
 
