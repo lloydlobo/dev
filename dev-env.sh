@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Source: https://github.com/ThePrimeagen/dev/blob/master/dev-env
+#
 # Usage:
 #
 #	DEV_ENV=~/Personal/dev ./dev-env.sh --dry
@@ -11,8 +13,8 @@ if [[ -z "$XDG_CONFIG_HOME" ]]; then
 fi
 
 if [[ -z "$DEV_ENV" ]]; then
-    echo "error: the environment variable DEV_ENV is not set";
-    echo "please set DEV_ENV to the path of your development environment";
+	echo "error: the environment variable DEV_ENV is not set";
+	echo "please set DEV_ENV to the path of your development environment";
 	exit 1;
 fi
 
@@ -80,12 +82,12 @@ copy() {
 }
 
 remove() {
-    if command -v trash &> /dev/null; then
-        trash $1;
-    else
-        echo "[WARNING]: 'trash' command not found. Falling back to 'rm'.";
-        rm -rf $1;
-    fi
+	if command -v trash &> /dev/null; then
+		trash $1;
+	else
+		echo "[WARNING]: 'trash' command not found. Falling back to 'rm'.";
+		rm -rf $1;
+	fi
 }
 
 update_files $DEV_ENV/env/.config $XDG_CONFIG_HOME;
