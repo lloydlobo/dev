@@ -11,3 +11,4 @@ bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xp
 # Go btw
 export GOROOT=/usr/local/go
 export PATH=$GOROOT/bin:$PATH
+export PATH=$HOME/go/bin:$PATH

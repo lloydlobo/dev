@@ -91,9 +91,9 @@ remove() {
 update_files $DEV_ENV/env/.config $XDG_CONFIG_HOME;
 update_files $DEV_ENV/env/.local $HOME/.local;
 
+# copy $DEV_ENV/dev-env $HOME/.local/scripts/dev-env;
 # copy $DEV_ENV/tmux-sessionizer/tmux-sessionizer.sh $HOME/.local/scripts/tmux-sessionizer.sh; # => git module
 copy $DEV_ENV/env/.tmux-sessionizer.sh $HOME/.tmux-sessionizer.sh; 
 copy $DEV_ENV/env/.xprofile $HOME/.xprofile;
 copy $DEV_ENV/env/.zsh_profile $HOME/.zsh_profile;
 copy $DEV_ENV/env/.zshrc $HOME/.zshrc;
-# copy $DEV_ENV/dev-env $HOME/.local/scripts/dev-env;
