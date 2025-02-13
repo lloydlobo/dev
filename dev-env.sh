@@ -53,7 +53,7 @@ update_files() {
 				remove $directory;
 			fi
 
-			log "    copying env: cp $c $2";
+			log "    copying env:  cp $c $2";
 			if [[ $dry_run == "0" ]]; then
 				cp -r ./$c $2;
 			fi
@@ -73,7 +73,7 @@ copy() {
 		return 1;
 	fi
 
-	log "copying: $1 to $2";
+	log "copying:  $1 to $2";
 	if [[ $dry_run == "0" ]]; then
 		cp $1 $2;
 	fi

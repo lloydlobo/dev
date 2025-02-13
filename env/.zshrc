@@ -72,6 +72,10 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git)
 
+# plugins=(fzf git)
+# [oh-my-zsh] fzf plugin: Cannot find fzf installation directory
+# Please add `export FZF_BASE=/path/to/fzf/install/dir` to your .zshrc
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
