@@ -14,11 +14,15 @@ has_session() {
     tmux list-sessions | grep -q "^$1:"
 }
 
+# Run .tmux-sessionizer.sh like direnv
 hydrate() {
     if [ -f $2/.tmux-sessionizer.sh ]; then
         tmux send-keys -t $1 "source $2/.tmux-sessionizer.sh" c-M
-    elif [ -f $HOME/.tmux-sessionizer ]; then
+    elif [ -f $HOME/.tmux-sessionizer.sh ]; then
         tmux send-keys -t $1 "source $HOME/.tmux-sessionizer.sh" c-M
+        # else
+        #     echo "WHY YOU NO RUN.....";
+        #     exit 1;
     fi
 }
 

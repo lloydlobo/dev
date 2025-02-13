@@ -4,4 +4,10 @@ VIM=nvim
 bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xprofile)
 
 
+
+# Rust btw
 . "$HOME/.cargo/env"
+
+# Go btw
+export GOROOT=/usr/local/go
+export PATH=$GOROOT/bin:$PATH
