@@ -19,3 +19,8 @@ cargo install stylua
 # popd
 #
 # luarocks install luacheck
+
+
+# git clone mausam
+# git clone gitback
+# git clone dirview
