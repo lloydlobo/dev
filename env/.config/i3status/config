@@ -6,15 +6,37 @@
 # ß
 # If the above line is not correctly displayed, fix your editor first!
 
+# Sources:
+# - https://github.com/ThePrimeagen/dev/blob/master/env/.config/i3status/config
+
 general {
         colors = true
         interval = 5
 }
 
-order += "disk /"
-order += "battery all"
 order += "load"
+order += "memory"
+order += "disk /"
+
+order += "battery 0" # "battery all"
 order += "tztime local"
+
+# 1 CPU
+load {
+        format = "cpu %1min"
+}
+
+# 2 MEM
+memory {
+        format = "mem %used"
+        threshold_degraded = "10%"
+        format_degraded = "MEMORY: %free"
+}
+
+# 3 DISK
+disk "/" {
+        format = "disks %avail"
+}
 
 battery all {
         format = "%status %percentage %remaining"
@@ -23,12 +45,3 @@ battery all {
 tztime local {
         format = "%Y-%m-%d %H:%M:%S"
 }
-
-load {
-        format = "%1min"
-}
-
-disk "/" {
-        format = "%avail"
-}
-
