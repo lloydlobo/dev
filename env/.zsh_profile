@@ -1,14 +1,40 @@
 export XDG_CONFIG_HOME=$HOME/.config
+
+PERSONAL=$XDG_CONFIG_HOME/Personal
 VIM=nvim
 
-bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xprofile)
+# Note: "dev" is at $HOME/Personal/dev; so move it to $HOME?
+#	DEV_ENV=$HOME/dev 
 
+# =============================================================================
+# Source (`-L`     Follow symbolic links) in $PERSONAL
+for i in `find -L $PERSONAL`; do
+	echo "$i"; # HACK: TEMPORARY: => /home/user/.config/Personal
+	# source "$i"; # Note: unimplemented
+done
 
+# =============================================================================
+# FZF
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# Rust btw
-. "$HOME/.cargo/env"
-
-# Go btw
+# =============================================================================
+# Exports env variables
+# export GOPATH=$HOME/.local/go # unimplemented
+export DEV_ENV_HOME="$HOME/Personal/dev"
+export GIT_EDITOR=$VIM
 export GOROOT=/usr/local/go
 export PATH=$GOROOT/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
+
+# =============================================================================
+# Bindings
+bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xprofile)
+
+# =============================================================================
+# Rust btw
+. "$HOME/.cargo/env"
+
+# =============================================================================
+# Sources:
+#
+#	- https://github.com/ThePrimeagen/dev/blob/master/env/.zsh_profile
