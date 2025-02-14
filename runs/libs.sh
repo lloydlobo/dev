@@ -4,7 +4,7 @@ sudo apt -y update
 
 
 # Essentials ==================================================================
-sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip
+sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip python3-venv
 # -----------------------------------------------------------------------------
 
 
