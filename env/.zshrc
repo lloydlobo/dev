@@ -86,11 +86,11 @@ source $ZSH/oh-my-zsh.sh
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='nvim'
-# fi
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='nvim'
+fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch $(uname -m)"
@@ -112,30 +112,6 @@ source ~/.zsh_profile
 #
 # To initialize zoxide, add this to your shell configuration file (usually ~/.zshrc):
 eval "$(zoxide init zsh)"
-
-# =============================================================================
-#
-# Update /home/user/.bashrc:
-#   - [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-#     - Already exists:
-#         Line 120:[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-#     ~ Skipped
-# Update /home/user/.zshrc:
-#   - [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-#     + Added
-# Check /home/user/.config/fish/functions/fish_user_key_bindings.fish:
-#   - Clear
-# Update /home/user/.config/fish/functions/fish_user_key_bindings.fish:
-#   - fzf --fish | source
-#     - Already exists:
-#         Line 2:  fzf --fish | source
-#     ~ Skipped
-# Finished. Restart your shell or reload config file.
-#    source ~/.bashrc  # bash
-#    source ~/.zshrc   # zsh
-#    fzf_key_bindings  # fish
-# Use uninstall script to remove fzf.
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # =============================================================================
 #
