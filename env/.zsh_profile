@@ -1,10 +1,14 @@
+# file: .zsh_profile
+#
+# Sources:
+#
+#	- https://github.com/ThePrimeagen/dev/blob/master/env/.zsh_profile
+
 export XDG_CONFIG_HOME=$HOME/.config
 
 PERSONAL=$XDG_CONFIG_HOME/Personal
 VIM=nvim
-
-# Note: "dev" is at $HOME/Personal/dev; so move it to $HOME?
-#	DEV_ENV=$HOME/dev 
+#DEV_ENV=$HOME/dev	 			# Note: "dev" is at $HOME/Personal/dev; so move it to $HOME?
 
 # =============================================================================
 # Source (`-L`     Follow symbolic links) in $PERSONAL
@@ -39,13 +43,13 @@ bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xp
 # =============================================================================
 # Aliases
 alias gs="git status --short --branch"
+alias gt='NODE_OPTIONS="--no-deprecation" gt'
 alias lg="lazygit"
 alias vim="nvim"
 alias vimog="vim"
 
 # =============================================================================
-# Funcs
-
+# Cat Funcs
 catr () {
 	tail -n "+$1" $3 | head -n "$( ( $2 - $1 + 1 ) )"
 }
@@ -54,6 +58,8 @@ cat1Line() {
 	cat $1 | tr -d "\n"
 }
 
+# =============================================================================
+# Path Funcs
 addToPath() {
 	if [[ "$PATH" != *"$1"* ]]; then
 		export PATH=$PATH:$1
@@ -75,14 +81,10 @@ addToPathFront() {
 # addToPathFront $HOME/.zig
 addToPathFront $HOME/.local/scripts/
 
+# addToPath $HOME/.local/Personal/
+# addToPath $HOME/Personal/ghostty/zig-out/bin/
 # addToPathFront $HOME/.deno/bin/
-# addToPathFront $HOME/.local/Personal/
-# addToPathFront $HOME/Personal/ghostty/zig-out/bin/
+# addToPathFront $HOME/.local/go/bin # is this necessary
 # addToPathFront $HOME/Personal/sumneko/bin/
-addToPathFront $HOME/.cargo/bin/
+addToPath $HOME/.cargo/bin/
 addToPathFront /usr/local/go/bin/
-
-# =============================================================================
-# Sources:
-#
-#	- https://github.com/ThePrimeagen/dev/blob/master/env/.zsh_profile
