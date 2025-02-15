@@ -12,7 +12,7 @@ VIM=nvim
 
 # =============================================================================
 # Source (`-L`     Follow symbolic links) in $PERSONAL
-if [[ false ]]; then
+if false; then
 	for i in `find -L $PERSONAL`; do
 		echo "$i"; # HACK: TEMPORARY: => /home/user/.config/Personal
 		# source "$i"; # Note: unimplemented

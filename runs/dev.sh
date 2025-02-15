@@ -7,7 +7,9 @@ git config --global user.name "Lloyd Lobo"
 
 cargo install stylua
 
+# =============================================================================
 # Needs development installation of Lua5.1
+#
 # luarocks installed in ./neovim.sh
 # pushd /tmp/luarocks-3.11.0
 # (
@@ -20,7 +22,9 @@ cargo install stylua
 #
 # luarocks install luacheck
 
+# =============================================================================
+# Dogfooding
 
-# git clone mausam
-# git clone gitback
-# git clone dirview
+# git clone https://github.com/lloydlobo/mausam
+# git clone https://github.com/lloydlobo/gitback
+# git clone https://github.com/lloydlobo/dirview

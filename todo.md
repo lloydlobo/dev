@@ -1,6 +1,6 @@
 # todo
 
-- [ ] use nvim as default editor
-- [ ] `alias v=nvim`
+- [x] use nvim as default editor
+- [x] `alias v=nvim`
 
 
