@@ -216,8 +216,13 @@ bar {
         tray_output primary
 }
 
-
-# Childz: No borders
+# No borders. Source: Childz
 for_window [class="^.*"] border pixel 2
-                          # class                 border  backgr. text    indicator child_border
-for_window [class="^.*"] client.focused          #77dd77 #285577 #ffffff #2e9ef4   #285577
+#
+# Error:
+#       /var/log/syslog│Feb 16 10:32:30 pop-os /usr/libexec/gdm-x-session[2240]: 02/16/2025 10:32:30 AM - ERROR: Expected one of these tokens: <end>, '[', 'move', 'exec', 'exit', 'restart', 'reload', 'shmlog', 'debuglog', 'border', 'layout', 'append_layout', 'workspace', 'focus', 'kill', 'open', 'fullscreen', 'sticky', 'split', 'floating', 'mark', 'unmark', 'resize', 'rename', 'nop', 'scratchpad', 'swap', 'title_format', 'title_window_icon', 'mode', 'bar' │
+#       syslog│Feb 16 10:31:58 pop-os /usr/libexec/gdm-x-session[2240]: 02/16/2025 10:31:58 AM - ERROR: Your command: [id="35651616"] client.focused          #77dd77 #285577 #ffffff #2e9e│
+#       syslog│Feb 16 10:31:58 pop-os /usr/libexec/gdm-x-session[2240]: 02/16/2025 10:31:58 AM - ERROR:                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^│
+#
+#                          # class                 border  backgr. text    indicator child_border
+# for_window [class="^.*"] client.focused          #77dd77 #285577 #ffffff #2e9ef4   #285577
