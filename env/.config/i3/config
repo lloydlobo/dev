@@ -186,6 +186,7 @@ bindsym $mod+r mode "resize"
 
 
 # Define the "mixer" mode with volume control
+# Bind $mod+Shift+v to enter the "mixer" mode
 mode "mixer" {
     # Increase volume by 5%
     bindsym k exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5% && $refresh_i3status
@@ -204,10 +205,24 @@ mode "mixer" {
     bindsym Escape mode "default"
     bindsym $mod+Shift+v mode "default"
 }
-
-# Bind $mod+Shift+v to enter the "mixer" mode
 bindsym $mod+Shift+v mode "mixer"
 
+# Define the "apps" mode to launch my long running custom applications
+# Bind $mod+Shift+a to enter the "apps" mode
+mode "apps" {
+    # Launch razoredge GUI window
+    bindsym r exec --no-startup-id ~/go/bin/razoredge && $refresh_i3status
+    # TODO: Launch dirview open current dir in browser 
+    # bindsym d exec --no-startup-id ~/go/bin/dirview && $refresh_i3status
+    # TODO: Launch gitback tui in CWD terminal
+    # bindsym g exec --no-startup-id ~/go/bin/gitback && $refresh_i3status
+
+    # Return to normal mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+Shift+a mode "default"
+}
+bindsym $mod+Shift+a mode "apps"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
