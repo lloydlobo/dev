@@ -1,4 +1,3 @@
 # todo
 
-- [x] use nvim as default editor
-- [x] `alias v=nvim`
+- [ ] open `lnav` and `btop` in last window on session start
