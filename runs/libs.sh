@@ -9,7 +9,7 @@ sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip python3
 
 
 # Convenience =================================================================
-sudo apt -y install entr lnav plocate
+sudo apt -y install entr lnav plocate rsibreak
 sudo apt -y install expect # https://core.tcl.tk/expect/ provides: unbuffer
 
 cargo install gping navi tealdeer tokei yazi-cli zoxide
@@ -18,7 +18,6 @@ cargo install --locked yazi-fm yazi-cli #  yazi additional dependencies:
 
 go install github.com/air-verse/air@latest
 # -----------------------------------------------------------------------------
-
 
 # DIY =================================================================
 if [[ ! -d "$HOME/Personal/fzf" ]]; then # Installs .fzf.bash .fzf.zsh in $HOME (Useful with ^R `$ (backward-search)`)
