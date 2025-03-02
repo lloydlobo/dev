@@ -4,6 +4,8 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 git config --global user.email "lloydlobo4@gmail.com"
 git config --global user.name "Lloyd Lobo"
+git config --global init.defaultBranch master
+# [ ] Add color diffing for renamed/moved (avoid noise)
 
 cargo install stylua
 
