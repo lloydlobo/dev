@@ -12,8 +12,8 @@ sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip python3
 sudo apt -y install entr lnav plocate rsibreak yt-dlp
 sudo apt -y install expect # https://core.tcl.tk/expect/ provides: unbuffer
 
-cargo install gping navi tealdeer tokei yazi-cli zoxide
-cargo install --locked yazi-fm yazi-cli #  yazi additional dependencies:
+cargo install --jobs=4 gping navi tealdeer tokei yazi-cli zoxide
+cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
 #                                          sudo apt -y install ffmpeg 7zip jq poppler-utils fd-find ripgrep fzf zoxide imagemagick
 
 go install github.com/air-verse/air@latest
