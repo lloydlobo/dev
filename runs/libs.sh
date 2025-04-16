@@ -9,7 +9,7 @@ sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip python3
 
 
 # Convenience =================================================================
-sudo apt -y install entr lnav plocate rsibreak yt-dlp
+sudo apt -y install entr lnav plocate redshift rsibreak yt-dlp
 sudo apt -y install expect # https://core.tcl.tk/expect/ provides: unbuffer
 
 cargo install --jobs=4 gping navi tealdeer tokei yazi-cli zoxide
