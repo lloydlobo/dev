@@ -1,3 +1,6 @@
 # todo
 
-- [ ] open `lnav` and `btop` in last window on session start
+- [ ] Open in last window on session start
+    - [ ] `lnav`
+    - [ ] `btop`
+    - [ ] `redshift`
