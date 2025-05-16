@@ -6,6 +6,7 @@
 
 export XDG_CONFIG_HOME=$HOME/.config
 export GTK_THEME=Adwaita:dark nautilus
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 # exec_always --no-startup-id exec export LANG=en_US.UTF-8
 
 PERSONAL=$XDG_CONFIG_HOME/Personal

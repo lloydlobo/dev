@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-# Source: https://forum.endeavouros.com/t/setting-environment-variables-before-i3wm-starts/31645
-# Thanks @anthony93
-export GTK_THEME=Adwaita:dark nautilus
