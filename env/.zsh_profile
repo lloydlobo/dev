@@ -31,6 +31,8 @@ export GIT_EDITOR=$VIM
 export GOROOT=/usr/local/go
 export PATH=$GOROOT/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
+# For Zed binary installed via `curl -f https://zed.dev/install.sh | sh`
+export PATH=$HOME/.local/bin:$PATH
 
 # =============================================================================
 # Bindings

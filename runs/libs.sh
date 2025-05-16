@@ -19,9 +19,29 @@ cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies
 go install github.com/air-verse/air@latest
 # -----------------------------------------------------------------------------
 
-# DIY =================================================================
+# DIY ========================================================================
 if [[ ! -d "$HOME/Personal/fzf" ]]; then # Installs .fzf.bash .fzf.zsh in $HOME (Useful with ^R `$ (backward-search)`)
   git clone git@github.com:junegunn/fzf.git $HOME/Personal/fzf
   $HOME/Personal/fzf/install
 fi
+# -----------------------------------------------------------------------------
+
+
+# IDE =========================================================================
+
+# Zed
+# To run Zed from your terminal, you must add ~/.local/bin to your PATH
+# Run:
+#    echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.zshrc
+#    source ~/.zshrc
+# To run Zed now, '~/.local/bin/zed'
+curl -f https://zed.dev/install.sh | sh
+
+# VSCodium
+wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
+    | gpg --dearmor \
+    | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg
+echo 'deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg] https://download.vscodium.com/debs vscodium main' \
+    | sudo tee /etc/apt/sources.list.d/vscodium.list
+sudo apt update && sudo apt install codium
 # -----------------------------------------------------------------------------
