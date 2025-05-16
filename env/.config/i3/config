@@ -11,7 +11,9 @@ include ~/.config/i3/env-var.sh
 #
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
+# Set the mod key to the winkey
 set $mod Mod4
+# set $alt Mod1
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -43,6 +45,12 @@ bindsym $mod+Shift+period exec systemctl suspend
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
+exec --no-startup-id vivaldi
+exec --no-startup-id wezterm
+
+exec --no-startup-id rsibreak
+exec_always --no-startup-id redshift -P0 3600
+
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
@@ -52,6 +60,8 @@ bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOU
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
+floating_minimum_size 75 x 50
+floating_maximum_size -1 x -1
 
 # start a terminal
 #bindsym $mod+Return exec i3-sensible-terminal
@@ -92,6 +102,37 @@ bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
+# enable floating mode for all XTerm windows
+for_window [class="XTerm"] floating enable
+
+# Make all urxvts use a 1-pixel border:
+for_window [class="urxvt"] border pixel 1
+
+# A less useful, but rather funny example:
+# makes the window floating as soon as I change
+# directory to ~/work
+for_window [title="x200: ~/work"] floating enable
+
+# No borders. Source: Childz
+for_window [class="^.*"] border pixel 2
+
+# Please note that new_window and new_float have been deprecated in favor of
+# the above options and will be removed in a future release. We strongly
+# recommend using the new options instead.
+#
+# The "normal" and "pixel" border styles support an optional border width in pixels:
+default_border pixel
+# A 3 px border
+default_border pixel 3
+# The same as default_border none
+default_border pixel 0
+
+# hide_edge_borders has replaced the old smart_borders syntax. Use the former instead of the latter.
+# Syntax:
+# hide_edge_borders none|vertical|horizontal|both|smart|smart_no_gaps
+# Example:
+hide_edge_borders vertical
+
 # split in horizontal orientation
 bindsym $mod+Ctrl+h split h
 
@@ -130,6 +171,35 @@ set $ws7 "7"
 set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
+
+# For instance: Assume you are on workspace "1: www" and switch to "2: IM"
+# using mod+2 because somebody sent you a message. You don’t need to remember
+# where you came from now, you can just press $mod+2 again to switch back to "1: www".
+workspace_auto_back_and_forth yes
+
+# See https://github.com/HarshalRathore/my-i3-config/blob/81559e692a7c4176890ac9f07ae1f24904c76cb8/.config/i3/config#L687-L696
+bindsym $alt+z workspace back_and_forth
+bindsym $alt+Control+j workspace prev
+bindsym $alt+Control+k workspace next
+bindsym $alt+Control+Left workspace prev
+bindsym $alt+Control+Right workspace next
+# FIXME: Pressing $mod+v inserts this into terminal input
+# force_display_urgency_hint 500 ms
+
+# Bind programs to workspace and focus on them at startup
+# See https://github.com/HarshalRathore/my-i3-config/blob/main/.config/i3/config
+assign [class="wezterm"] $ws1
+assign [class="Xfce4-terminal"] $ws1
+assign [class="(?i)brave-browser"] $ws2
+assign [class="(?i)vivaldi"] $ws2
+assign [class="(?i)firefox"] $ws2
+assign [class="Code"] $ws3
+assign [class="Org.gnome.Nautilus"] $ws4
+assign [class="TelegramDesktop"] $ws5
+assign [class="btop"] $ws0
+assign [class="lnav"] $ws0
+assign [class="gnome-terminal"] $ws0
+assign [class="i3-sensible-terminal"] $ws0
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
@@ -217,8 +287,10 @@ bindsym $mod+Shift+v mode "mixer"
 mode "apps" {
     # Launch razoredge GUI window
     bindsym r exec --no-startup-id ~/go/bin/razoredge && $refresh_i3status
+
     # TODO: Launch dirview open current dir in browser 
     # bindsym d exec --no-startup-id ~/go/bin/dirview && $refresh_i3status
+
     # TODO: Launch gitback tui in CWD terminal
     # bindsym g exec --no-startup-id ~/go/bin/gitback && $refresh_i3status
 
@@ -229,6 +301,27 @@ mode "apps" {
 }
 bindsym $mod+Shift+a mode "apps"
 
+
+# redshift modes to make looking at screen bearable for longer times
+# See https://github.com/HarshalRathore/my-i3-config/blob/81559e692a7c4176890ac9f07ae1f24904c76cb8/.config/i3/config#L670C1-L685C2
+bindsym $mod+Shift+d mode "$mode_redshift"
+set $mode_redshift Set colour temperature: (a)uto, (r)eset, (2)500K, (3)000K, (4)000K, (5)000K
+set $kill_redshift pkill -9 redshift;
+mode "$mode_redshift" {
+    bindsym a exec --no-startup-id "$kill_redshift redshift -P -t 5000:4000", mode "default"
+    bindsym r exec --no-startup-id "$kill_redshift redshift -x", mode "default"
+    bindsym 2 exec --no-startup-id "$kill_redshift redshift -P -O 2500", mode "default"
+    bindsym 3 exec --no-startup-id "$kill_redshift redshift -P -O 3000", mode "default"
+    bindsym 4 exec --no-startup-id "$kill_redshift redshift -P -O 4000", mode "default"
+    bindsym 5 exec --no-startup-id "$kill_redshift redshift -P -O 5000", mode "default"
+ 
+    # exit mode: "Enter" or "Escape"
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+
+# i3bar
+
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
@@ -236,13 +329,38 @@ bar {
         tray_output primary
 }
 
-# No borders. Source: Childz
-for_window [class="^.*"] border pixel 2
+# FIXME: Fails to toggle when workspaces are changed. Requires config reload
+# Toggle between hide state and show state
+bindsym $mod+m bar hidden_state toggle
+# Toggle between dock mode and hide mode
+bindsym $mod+n bar mode toggle
+# Set the bar instance with id 'bar-1' to switch to hide mode
+bindsym $mod+b bar mode hide                    #::: bindsym $mod+b bar mode hide bar-1
+# Set the bar instance with id 'bar-1' to always stay hidden
+bindsym $mod+Shift+b bar mode invisible         #::: bindsym $mod+Shift+b bar mode invisible bar-1
+
+# Scratchpad
+# See https://i3wm.org/docs/userguide.html#_scratchpad
+
+# Make the currently focused window a scratchpad
+bindsym $mod+Shift+minus move scratchpad
+# Show the first scratchpad window
+bindsym $mod+minus scratchpad show
+# Show the sup-mail scratchpad window, if any.
+#   bindsym mod4+s [title="^Sup ::"] scratchpad show
+# Move all floating windows to the scratchpad
+bindsym $mod+x [floating] move scratchpad
+
+# Startup applications
 #
-# Error:
-#       /var/log/syslog│Feb 16 10:32:30 pop-os /usr/libexec/gdm-x-session[2240]: 02/16/2025 10:32:30 AM - ERROR: Expected one of these tokens: <end>, '[', 'move', 'exec', 'exit', 'restart', 'reload', 'shmlog', 'debuglog', 'border', 'layout', 'append_layout', 'workspace', 'focus', 'kill', 'open', 'fullscreen', 'sticky', 'split', 'floating', 'mark', 'unmark', 'resize', 'rename', 'nop', 'scratchpad', 'swap', 'title_format', 'title_window_icon', 'mode', 'bar' │
-#       syslog│Feb 16 10:31:58 pop-os /usr/libexec/gdm-x-session[2240]: 02/16/2025 10:31:58 AM - ERROR: Your command: [id="35651616"] client.focused          #77dd77 #285577 #ffffff #2e9e│
-#       syslog│Feb 16 10:31:58 pop-os /usr/libexec/gdm-x-session[2240]: 02/16/2025 10:31:58 AM - ERROR:                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^│
+# --no-startup-id: Execute the script, which is not yet startup-notification aware.
 #
-#                          # class                 border  backgr. text    indicator child_border
-# for_window [class="^.*"] client.focused          #77dd77 #285577 #ffffff #2e9ef4   #285577
+# See 4.16. Variables
+# Variables are directly replaced in the file when parsing. Variables expansion is not recursive so it is not possible to define a variable with a value containing another variable. There is no fancy handling and there are absolutely no plans to change this. If you need a more dynamic configuration you should create a little script which generates a configuration file and run it before starting i3 (for example in your ~/.xsession file).
+#
+# Also see [xresources] to learn how to create variables based on resources loaded from the X resource database.
+#
+# See https://i3wm.org/docs/userguide.html#_automatically_starting_applications_on_i3_startup
+# exec_always --no-startup-id ~/.config/i3/env-var.sh
+exec_always --no-startup-id exec export GTK_THEME=Adwaita:dark nautilus && $refresh_i3status
+exec_always --no-startup-id exec export LANG=en_US.UTF-8
