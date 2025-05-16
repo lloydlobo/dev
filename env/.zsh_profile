@@ -5,6 +5,8 @@
 #	- https://github.com/ThePrimeagen/dev/blob/master/env/.zsh_profile
 
 export XDG_CONFIG_HOME=$HOME/.config
+export GTK_THEME=Adwaita:dark nautilus
+# exec_always --no-startup-id exec export LANG=en_US.UTF-8
 
 PERSONAL=$XDG_CONFIG_HOME/Personal
 VIM=nvim

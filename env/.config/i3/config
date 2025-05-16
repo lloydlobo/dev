@@ -13,7 +13,7 @@ include ~/.config/i3/env-var.sh
 
 # Set the mod key to the winkey
 set $mod Mod4
-# set $alt Mod1
+set $alt Mod1
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -24,7 +24,7 @@ set $mod Mod4
 #   $ fc-list
 #   $ fc-cache
 # font pango:DejaVu Sans Mono 7
-font pango:JuliaMono 7
+font pango:JuliaMono 8
 
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
@@ -177,12 +177,16 @@ set $ws10 "10"
 # where you came from now, you can just press $mod+2 again to switch back to "1: www".
 workspace_auto_back_and_forth yes
 
+# workspace back and forth (with/without active container)
+# Ctrl+Alt + j <-- move to right workspace
+# Ctrl+Alt + k --> move to left workspace
 # See https://github.com/HarshalRathore/my-i3-config/blob/81559e692a7c4176890ac9f07ae1f24904c76cb8/.config/i3/config#L687-L696
 bindsym $alt+z workspace back_and_forth
 bindsym $alt+Control+j workspace prev
 bindsym $alt+Control+k workspace next
 bindsym $alt+Control+Left workspace prev
 bindsym $alt+Control+Right workspace next
+
 # FIXME: Pressing $mod+v inserts this into terminal input
 # force_display_urgency_hint 500 ms
 
@@ -362,5 +366,5 @@ bindsym $mod+x [floating] move scratchpad
 #
 # See https://i3wm.org/docs/userguide.html#_automatically_starting_applications_on_i3_startup
 # exec_always --no-startup-id ~/.config/i3/env-var.sh
-exec_always --no-startup-id exec export GTK_THEME=Adwaita:dark nautilus && $refresh_i3status
-exec_always --no-startup-id exec export LANG=en_US.UTF-8
+# exec_always --no-startup-id exec export GTK_THEME=Adwaita:dark nautilus && $refresh_i3status
+# exec_always --no-startup-id exec export LANG=en_US.UTF-8
