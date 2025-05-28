@@ -191,12 +191,15 @@ bindsym $alt+Control+Right workspace next
 # Bind programs to workspace and focus on them at startup
 # See https://github.com/HarshalRathore/my-i3-config/blob/main/.config/i3/config
 assign [class="wezterm"] $ws1
+assign [class="clion"] $ws1
 assign [class="Xfce4-terminal"] $ws1
 assign [class="(?i)brave-browser"] $ws2
 assign [class="(?i)vivaldi"] $ws2
 assign [class="(?i)firefox"] $ws2
-assign [class="Code"] $ws3
-assign [class="Org.gnome.Nautilus"] $ws4
+assign [class="codium"] $ws3
+# assign [class="Org.gnome.Nautilus"] $ws4
+assign [class="nautilus"] $ws4
+assign [class="jetbrains-toolbox"] $ws4
 assign [class="TelegramDesktop"] $ws5
 assign [class="btop"] $ws0
 assign [class="lnav"] $ws0
@@ -329,6 +332,15 @@ mode "$mode_redshift" {
 bar {
         status_command i3status
         tray_output primary
+
+        # Disable mouse scroll workspace
+        bindsym button4 nop
+        bindsym button5 nop
+        bindsym button6 nop
+        bindsym button7 nop
+
+        # Take a screenshot by right clicking on the bar
+        bindsym --release button3 exec --no-startup-id import /tmp/latest-screenshot.png
 }
 
 # FIXME: Fails to toggle when workspaces are changed. Requires config reload
