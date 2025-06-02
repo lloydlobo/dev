@@ -12,6 +12,7 @@ sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip python3
 sudo apt -y install entr lnav plocate redshift rsibreak yt-dlp # redshift -PO 3600
 sudo apt -y install expect # https://core.tcl.tk/expect/ provides: unbuffer
 sudo apt -y install valgrind
+sudo apt -y install linux-tools-$(uname -r)
 
 cargo install --jobs=4 bat gping navi tealdeer tokei yazi-cli zoxide
 cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
