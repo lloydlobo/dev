@@ -12,7 +12,8 @@ sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip python3
 # //////////////////////////////
 sudo apt -y install entr lnav plocate redshift rsibreak yt-dlp # redshift -PO 3600
 
-sudo apt -y install expect                                     # https://core.tcl.tk/expect/ provides: unbuffer
+sudo apt -y install expect                                     # https://core.tcl.tk/expect/        Provides: unbuffer
+sudo apt -y install sysstat                                    # https://github.com/sysstat/sysstat Provides: iostat
 
                                                                # ffmpeg 7zip jq poppler-utils fd-find ripgrep fzf zoxide imagemagick
 
