@@ -5,6 +5,8 @@ sudo apt -y update
 # //////////////////////////////
 # ESSENTIALS 
 # //////////////////////////////
+sudo apt -y install build-essential libtool-bin python3-dev automake flex bison libglib2.0-dev
+
 sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip python3-venv
 
 # //////////////////////////////
