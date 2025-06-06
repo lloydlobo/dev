@@ -9,6 +9,8 @@ sudo apt -y install build-essential libtool-bin python3-dev automake flex bison 
 
 sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip python3-venv
 
+sudo apt -y install clang
+
 # //////////////////////////////
 # CONVENIENCE 
 # //////////////////////////////
