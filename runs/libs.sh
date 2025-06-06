@@ -30,7 +30,7 @@ cargo install --jobs=4 --locked yazi-fm yazi-cli               #  yazi additiona
 # //////////////////////////////
 # Dynamic code analysis
 # //////////////////////////////
-sudo apt -y install valgrind
+sudo apt -y install valgrind afl++
 
 # perf *************************
 sudo apt -y install linux-tools-$(uname -r)
