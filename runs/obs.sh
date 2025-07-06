@@ -16,16 +16,21 @@ sudo apt -y install obs-studio
 #     See: https://obsproject.com/kb/virtual-camera-troubleshooting
 #     See: https://github.com/obsproject/obs-studio/wiki/install-instructions#prerequisites-for-all-versions
 #-------------------------------------------------
+
 sudo apt -y install v4l2loopback-dkms
 
+#
 # Verify
+#
 #     sudo modprobe v4l2loopback
 #     ls -1 /sys/devices/virtual/video4linux
+#
 # You can find a number of scenarios on the wiki at http://github.com/umlaeute/v4l2loopback/wiki
 #
 # The specific parameters mentioned are common recommendations from Linux/OBS
 # community guides, but the basic sudo modprobe v4l2loopback should be
 # sufficient to get it working.
+#
 sudo modprobe v4l2loopback devices=1 video_nr=10 card_label="OBS Cam" exclusive_caps=1
 
 # You can check what device was created with:
@@ -55,10 +60,10 @@ v4l2-ctl --list-devices
 # If the issue is likely that your OBS virtual camera is trying to use
 # /dev/video0 which is probably your physical webcam. Let's fix this:
 #
-# WARN: /dev/video0 sometimes worked for me aswell
+# WARN: /dev/video0 sometimes worked for me aswell during `ffplay /dev/video10`
 #
 
-# Remove the module if loaded
+# *Remove* the module if loaded (WARN: Remember to switch *off* virtual camera)
 sudo modprobe -r v4l2loopback
 # Load it with a specific video number that's not in use
 sudo modprobe v4l2loopback devices=1 video_nr=10 card_label="OBS Cam" exclusive_caps=1
@@ -66,18 +71,23 @@ sudo modprobe v4l2loopback devices=1 video_nr=10 card_label="OBS Cam" exclusive_
 ls /dev/video*
 # You should now see both /dev/video0 (your real camera) and /dev/video10 (OBS virtual camera).
 v4l2-ctl --list-devices
-# This should show OBS output
+# This should show OBS output (WARN: Remember to switch *on* virtual camera)
 ffplay /dev/video10
 
+#
 # Make it load automatically at boot
+#
 echo 'v4l2loopback' | sudo tee /etc/modules-load.d/v4l2loopback.conf
 
+#
 # Set module options permanently
-#     echo 'options v4l2loopback devices=1 video_nr=10 card_label="OBS Cam" exclusive_caps=1' | sudo tee /etc/modprobe.d/v4l2loopback.conf
+#
+#	  echo 'options v4l2loopback devices=1 video_nr=10 card_label="OBS Cam" exclusive_caps=1' | sudo tee /etc/modprobe.d/v4l2loopback.conf
 
 #-------------------------------------------------
 # OBS: GPU driver (NVIDIA)
 #-------------------------------------------------
+
 lsmod | grep nouveau
 lspci | grep -i nvidia
 sudo ubuntu-drivers autoinstall # (NOTE: `sudo reboot` after installation)

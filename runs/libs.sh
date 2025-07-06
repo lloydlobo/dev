@@ -29,6 +29,7 @@ sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iosta
 #sudo apt -y install ffmpeg 7zip jq poppler-utils fd-find ripgrep fzf zoxide imagemagick
 
 go install github.com/air-verse/air@latest
+go install github.com/charmbracelet/glow@latest
 
 cargo install --jobs=4 bat gping navi tealdeer tokei yazi-cli zoxide
 
