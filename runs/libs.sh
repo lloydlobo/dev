@@ -38,6 +38,8 @@ cargo install --jobs=4 bat gping navi tealdeer tokei yazi-cli zoxide
 
 cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
 
+cargo install --jobs=4 --locked serpl
+
 #/////////////////////////////////////////////////
 # Dynamic code analysis
 #/////////////////////////////////////////////////
