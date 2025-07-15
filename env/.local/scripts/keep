@@ -6,8 +6,8 @@ set -euo pipefail # Exit on error, undefined vars, pipe failures.
 # TODO:
 #   - [x] Can't we just use zsh history like timestamp? (20250714160133UTC but Unix?)
 #   - [x] Initialize git repositiory here
-#   - [ ] Report error, on `$0 hello world` (valid: $0 --join hello world OR $0 "hello world")
-#   - [ ] ...
+#   - [?] Report error, on `$0 hello world` (valid: $0 --join hello world OR $0 "hello world")
+#   - [x] Pipe verbose logging via || true, for non-blocking flow: pop only works with the verbose flag on. (weird huh?)
 # TODO:
 #   - [x] Fixed shebang: #!/usr/bin/env bash
 #   - [x] Better variable naming: PROGRAM_NAME instead of PROGN
@@ -18,16 +18,31 @@ set -euo pipefail # Exit on error, undefined vars, pipe failures.
 #   - [x] Cleaner timestamp handling: Uses single
 #   - [x] Defined prefix{generate,trim} functions: Trim the prefix from result of tail for each line.
 #   - [ ] ...
+# TODO:
 #   - [ ] ...
 #
 
+##################################################
+# Core
+##################################################
+
+#-------------------------------------------------
+# Command Parser.
+#-------------------------------------------------
+
+#
 # Configuration.
+#
 readonly PROGRAM_NAME="keep"
 readonly DIR="${DIR:-$HOME/.$PROGRAM_NAME}"
 readonly HISTORY_FILE="$DIR/${PROGRAM_NAME}_history"
 readonly MAX_ENTRIES="${MAX_ENTRIES:-2000}"
+readonly ENTRY_PREFIX_CHAR=":" # NOTE: `:` is safe to use in the shell as the first char.
+readonly TIMESTAMP_FORMAT='%s' # NOTE: Unix timestamp. (seconds since the Unix epoch)
 
+#
 # Flags
+#
 is_clear_history=false
 is_join_args=false
 is_show_numbers=false
@@ -61,9 +76,11 @@ Examples:
 EOF
 }
 
+#
 # Argument parser parses the options.
-# WARN: Formatter may remove trailing semi-colons `;`. This would not
-# short-circuit the case branches and it would fall-through or give undefined behavior
+# WARN: Formatter may remove trailing semi-colons `;`.
+# Won't short-circuit case branches and would `fall-through` (undefined-behavior)
+#
 while [[ $# -gt 0 ]]; do
 	case $1 in
 	-v | --verbose)
@@ -123,6 +140,10 @@ done
 # Setup.
 #-------------------------------------------------
 
+#
+# WARN: >&2 may mess with redirected output from shell utils to local variables
+#       when log_verbose is called just before.
+#
 log_verbose() {
 	[[ "$is_verbose" == true ]] && echo "INFO: $1" >&2
 }
@@ -132,10 +153,9 @@ ensure_files() {
 	touch "$HISTORY_FILE" # OR `> "$HISTORY_FILE"`
 }
 
-readonly ENTRY_PREFIX_CHAR=":" # NOTE: `:` is safe to use in the shell as the first char.
-readonly TIMESTAMP_FORMAT='%s' # NOTE: Unix timestamp. (seconds since the Unix epoch)
-
+#
 # Writes to stream data with the format "<ENTRY_PREFIX_CHAR> <TIMESTAMP_FORMAT>".
+#
 generate_entry_prefix() {
 	local timestamp=$(date +"$TIMESTAMP_FORMAT")
 	echo "$ENTRY_PREFIX_CHAR $timestamp"
@@ -151,9 +171,12 @@ trim_entry_prefix() {
 
 add_to_history() {
 	local entry="$1"
-	local prefix=$(generate_entry_prefix)
+	local prefix=$(generate_entry_prefix) # ...with timestamp
 	echo "$prefix $entry" >>"$HISTORY_FILE"
-	log_verbose "Added to history: $entry"
+	log_verbose "Added to history: $entry" || true
+
+	local res=$(trim_entry_prefix "$prefix $entry")
+	echo $res
 
 	# Maintain max entries. (similar to zsh HISTSIZE)
 	if [[ -n "$MAX_ENTRIES" ]] && [[ "$MAX_ENTRIES" -gt 0 ]]; then
@@ -167,58 +190,31 @@ add_to_history() {
 	fi
 }
 
-bak__add_to_history() {
-	local entry="$1"
-
-	readonly TIMESTAMP_FORMAT='%s'               # Unix
-	local timestamp=$(date +"$TIMESTAMP_FORMAT") # Similar to ~/.zsh_history convention.
-	local prefix = ": $timestamp"                # NOTE: `:` is safe to use in the shell as the first char.
-
-	echo "$prefix $entry" >>"$HISTORY_FILE"
-	log_verbose "Added to history: $entry"
-
-	# Maintain max entries (similar to zsh HISTSIZE)
-	if [[ -n "$MAX_ENTRIES" ]] && [[ "$MAX_ENTRIES" -gt 0 ]]; then
-		local line_count=$(wc -l <"$HISTORY_FILE")
-		if ((line_count > MAX_ENTRIES)); then
-			local keep_lines=$((MAX_ENTRIES - 100))                      # Remove 100 oldest entries. (from start)
-			tail -n "$keep_lines" "$HISTORY_FILE" >"${HISTORY_FILE}.tmp" # Save just the last $keep_lines entries.
-			mv "${HISTORY_FILE}.tmp" "$HISTORY_FILE"
-			log_verbose "Trimmed history to $keep_lines entries"
-		fi
-	fi
-}
-
 pop_last_entries() {
 	local count="$1"
-	local total
-	total=$(wc -l <"$HISTORY_FILE")
+	local total=$(wc -l <"$HISTORY_FILE")
 	((count > total)) && count="$total"
+	if ((count > 0)); then # !WARN: Redirects/avoids blocking control flow with `|| true` hack!
+		log_verbose "Removing the following entries:" || true
+		entries_to_trim=$(tail -n "$count" "$HISTORY_FILE") # NOTE: Output of `tail` is redirected to $trimmed_entry.
+		echo "$(trim_entry_prefix "$entries_to_trim")"
 
-	if ((count == 0)); then
-		return
+		head -n "$((total - count))" "$HISTORY_FILE" >"$HISTORY_FILE.tmp"
+		mv "${HISTORY_FILE}.tmp" "$HISTORY_FILE"
+	else
+		log_verbose "No entries to remove" || true
 	fi
-
-	log_verbose "Removing the following entries:"
-	trimmed_entry=$(trim_entry_prefix $(tail -n "$count" "$HISTORY_FILE"))
-
-	tail -n "$count" "$HISTORY_FILE" # NOTE: This logs what is removed.
-	head -n "$((total - count))" "$HISTORY_FILE" >"$HISTORY_FILE.tmp"
-	mv "${HISTORY_FILE}.tmp" "$HISTORY_FILE"
 }
 
 show_history() {
 	local file="$HISTORY_FILE"
 	local result
-
 	if [[ -n "$search_pattern" ]]; then
 		result=$(grep "$search_pattern" "$file" || true)
-
 		# Apply search + tail filter combination to search-results.
 		if [[ -n "$tail_lines" ]]; then
 			result=$(echo "$result" | tail -n "$tail_lines")
 		fi
-
 		# Apply numbering if requested
 		if $is_show_numbers; then
 			echo "$result" | nl --number-width 3 --number-separator ': '
@@ -243,7 +239,7 @@ show_history() {
 }
 
 #-------------------------------------------------
-# Main logic
+# Main logic.
 #-------------------------------------------------
 
 ensure_files
@@ -267,7 +263,7 @@ fi
 
 input_processed=false
 
-# Read from stdin if there's a piped "|" input.
+# Read from `stdin` if there's a piped "|" input.
 if [ ! -t 0 ]; then
 	readonly is_experimental=true
 	if $is_experimental; then
@@ -302,16 +298,6 @@ if ! $input_processed; then
 	show_history
 fi
 
-#
-# !DELETE-ME!
-#
-# Reference: $ sed
-#
-#     command | sed 's/apple/mango/g' # search: apple replace: mango
-#     command | sed [-E|--regexp-extended] 's/(apple)/\U\1/g' # g is global flag
-#     sed [-i|--in-place] '/^[[:space:]]*$/d' path/to/file
-#     sed [-i|--in-place=].orig '1,5d' path/to/file
-#
 
 ## See `:h modeline`.
 ## vim:fileencoding=utf-8
