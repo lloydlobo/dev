@@ -1,0 +1,239 @@
+#!/usr/bin/env bash
+
+set -euo pipefail # Exit on error, undefined vars, pipe failures.
+
+#
+# TODO:
+#   - [x] Using "%s" UNIX timestamp: Can't we just use zsh history like timestamp? (20250714160133UTC but Unix?)
+#   - [x] Moved to Personal/dev/: Version control with git
+#   - [ ] Report error, on `$0 hello world` (valid: $0 --join hello world OR $0 "hello world")
+#   - [ ] ...
+# TODO:
+#   - [x] Fixed shebang: #!/usr/bin/env bash
+#   - [x] Better variable naming:  PROGN -> PROGRAM_NAME, ENTRIES_COUNT_MAX -> MAX_ENTRIES
+#   - [x] Pop functionality implemented: Now calls pop_last_entries
+#   - [x] Search + tail combination: Seems to work as expected
+# TODO:
+#   - [x] Input validation: Both tail and pop validate numeric input
+#   - [x] Cleaner timestamp handling: Uses single
+#   - [ ] ...
+#   - [ ] ...
+#
+
+# Configuration.
+readonly PROGRAM_NAME="keep"
+readonly DIR="${DIR:-$HOME/.$PROGRAM_NAME}"
+readonly HISTORY_FILE="$DIR/${PROGRAM_NAME}_history"
+readonly MAX_ENTRIES="${MAX_ENTRIES:-2000}"
+
+# Flags
+is_clear_history=false
+is_join_args=false
+is_show_numbers=false
+is_verbose=false
+pop_count=0
+search_pattern=""
+tail_lines=""
+
+usage() {
+    cat <<EOF
+Usage: $0 [options] [data...]
+    or: command | $0 [options]
+
+Options:
+    -c, --clear             Clear history
+    -h, --help              Show this help
+    -j, --join              Join all arguments as one entry
+    -n, --numbers           Show line numbers while displaying
+    -p, --pop N             Clear last N entries
+    -s, --search PATTERN    Search for pattern in history
+    -t, --tail N            Show last N entries
+    -v, --verbose           Show verbose output
+
+Examples:
+    echo "command executed" | $0
+    $0 "some manual entry"
+    $0 -t 10                # Show last 10 entries
+    $0 -s "git"             # Search for "git" in history
+    $0 -c                   # Clear history
+	$0 -s "git" -t 5        # Search for "git" and show last 5 matches
+EOF
+}
+
+# Argument parser parses the options.
+while [[ $# -gt 0 ]]; do
+    case $1 in
+    -v | --verbose) is_verbose=true shift ;;
+    -j | --join) is_join_args=true shift ;;
+    -n | --numbers) is_show_numbers=true shift ;;
+    -s | --search) search_pattern="$2" shift 2 ;;
+    -c | --clear) is_clear_history=true break ;;
+    -h | --help) usage exit 0 ;;
+    -t | --tail)
+        tail_lines="$2"
+        if ! [[ "$tail_lines" =~ ^[0-9]+$ ]]; then # Validate that tail_lines is numeric
+            echo "Invalid tail count: $tail_lines" >&2
+            exit 1
+        fi
+        shift 2
+        ;;
+    -p | --pop)
+        if [[ $# -lt 2 ]]; then
+            echo "Option --pop requires an argument" >&2
+            exit 1
+        fi
+        pop_count="$2"
+        if ! [[ "$pop_count" =~ ^[0-9]+$ ]]; then
+            echo "Invalid pop count: $pop_count" >&2
+            exit 1
+        fi
+        shift 2
+        ;;
+    --) shift break ;; # End of options
+    -*) echo "Unknown option: $1" exit 1 >&2 ;;
+    *) break ;; # Start of data arguments
+    esac
+done
+
+#-------------------------------------------------
+# Setup.
+#-------------------------------------------------
+
+log_verbose() {
+    [[ "$is_verbose" == true ]] && echo "INFO: $1" >&2
+}
+
+ensure_files() {
+    mkdir -p "$DIR"
+    touch "$HISTORY_FILE" # OR `> "$HISTORY_FILE"`
+}
+
+add_to_history() {
+    local entry="$1"
+    readonly TIMESTAMP_FORMAT='%s' # Unix
+    local timestamp=$(date +"$TIMESTAMP_FORMAT")
+
+    # Add entry with timestamps.
+    # NOTE: `:` is safe to use in the shell as the first char.
+    echo ": $timestamp $entry" >>"$HISTORY_FILE"
+    log_verbose "Added to history: $entry"
+
+    # Maintain max entries (similar to zsh HISTSIZE)
+    if [[ -n "$MAX_ENTRIES" ]] && [[ "$MAX_ENTRIES" -gt 0 ]]; then
+        local line_count=$(wc -l <"$HISTORY_FILE")
+        if ((line_count > MAX_ENTRIES)); then
+            local keep_lines=$((MAX_ENTRIES - 100))                      # Remove 100 oldest entries. (from start)
+            tail -n "$keep_lines" "$HISTORY_FILE" >"${HISTORY_FILE}.tmp" # Save just the last $keep_lines entries.
+            mv "${HISTORY_FILE}.tmp" "$HISTORY_FILE"
+            log_verbose "Trimmed history to $keep_lines entries"
+        fi
+    fi
+}
+
+pop_last_entries() {
+    local count="$1"
+    local total
+    total=$(wc -l <"$HISTORY_FILE")
+    ((count > total)) && count="$total"
+
+    if ((count == 0)); then
+        return
+    fi
+
+    echo "Removing the following entries:"
+    tail -n "$count" "$HISTORY_FILE" # NOTE: This logs what is removed.
+    head -n "$((total - count))" "$HISTORY_FILE" >"$HISTORY_FILE.tmp"
+    mv "${HISTORY_FILE}.tmp" "$HISTORY_FILE"
+}
+
+show_history() {
+    local file="$HISTORY_FILE"
+    local result
+
+    if [[ -n "$search_pattern" ]]; then
+        result=$(grep "$search_pattern" "$file" || true)
+
+        # Apply search + tail filter combination to search-results.
+        if [[ -n "$tail_lines" ]]; then
+            result=$(echo "$result" | tail -n "$tail_lines")
+        fi
+
+        # Apply numbering if requested
+        if $is_show_numbers; then
+            echo "$result" | nl --number-width 3 --number-separator ': '
+        else
+            echo "$result"
+        fi
+    elif [[ -n "$tail_lines" ]]; then
+        # Apply tail filter.
+        if $is_show_numbers; then
+            tail -n "$tail_lines" "$file" | nl --number-width 3 --number-separator ': '
+        else
+            tail -n "$tail_lines" "$file"
+        fi
+    else
+        # Show all.
+        if $is_show_numbers; then
+            nl --number-width 3 --number-separator ': ' "$file"
+        else
+            cat "$file"
+        fi
+    fi
+}
+
+#-------------------------------------------------
+# Main logic
+#-------------------------------------------------
+
+ensure_files
+
+if $is_clear_history; then
+    >"$HISTORY_FILE"
+    echo "History cleared"
+    exit 0
+fi
+
+if ((pop_count > 0)); then
+    pop_last_entries $pop_count
+    log_verbose "Removed last $pop_count entries"
+    exit 0
+fi
+
+if [[ -n "$search_pattern" ]] || [[ -n "$tail_lines" ]]; then
+    show_history
+    exit 0
+fi
+
+input_processed=false
+
+# Read from stdin if there's a piped "|" input.
+if [ ! -t 0 ]; then
+    if IFS= read -r piped_input; then
+        [[ -n "$piped_input" ]] && add_to_history "$piped_input" && input_processed=true
+    fi
+fi
+
+# Process command-line arguments.
+if [[ $# -gt 0 ]]; then
+    if $is_join_args; then
+        combined_args="$*"
+        add_to_history "$combined_args"
+    else
+        # !WARN: Each argument as separate entry.
+        for arg in "$@"; do
+            add_to_history "$arg"
+        done
+    fi
+    input_processed=true
+fi
+
+if ! $input_processed; then
+    echo "Recent history:"
+    tail_lines=10
+    show_history
+fi
+
+## See `:h modeline`.
+## vim:fileencoding=utf-8
+## vim:filetype=bash
+## vim: ts=4 sts=4 sw=4 et
