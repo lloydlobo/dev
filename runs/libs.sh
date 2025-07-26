@@ -19,6 +19,7 @@ sudo apt -y install clang nasm
 
 # UI/UX
 sudo apt -y install feh
+sudo apt -y install xcowsay acpitool
 
 # Media
 sudo apt -y install x264 mpv ffmpeg
