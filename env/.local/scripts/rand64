@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Ref: https://github.com/skeeto/dotfiles/blob/master/bin/rand64
+set -e
+count="${1:-1}"
+while [ "$count" -gt 0 ]; do
+	printf '0x%s\n' $(od -An -tx8 -N8 /dev/urandom)
+	count=$((count - 1))
+done
