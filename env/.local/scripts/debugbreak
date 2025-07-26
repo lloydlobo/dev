@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# debugbreak - SIGTRAP all debuggees on Linux
+# This is the Linux version of the same tool found in w64devkit.
+# Ref: https://github.com/skeeto/dotfiles/blob/master/bin/debugbreak
+set -e
+for pid in $(find /proc -maxdepth 1 -printf '%f\n' | grep '^[0-9]\+$'); do
+    grep -q '^TracerPid:\s[^0]' /proc/$pid/status 2>/dev/null &&
+        kill -TRAP $pid
+done
