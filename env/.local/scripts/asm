@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Print assembly and pare printed it down into something human-friendly.
+# Ref: https://github.com/skeeto/dotfiles/blob/master/bin/asm
+#    $ asm cc -Os example.c
+#    $ asm c++ -O2 -fno-exceptions example.cpp
+set -e
+"$@" -S -fno-ident -o - |
+  grep -Ev '\.(file|text|type|def|size|addrsig|weak|hidden|section|cfi|seh|byte|uleb|LC|LE|LF|LH|LL|L[a-z])' |
+  grep -Ev '^\s*#' | sed 's/\s*#.*//' | c++filt
+
+# c++filt
+#   Demangled names are displayed to stdout.
+#   If a name cannot be demangled it is just echoed to stdout.
+#   If no names are provided on the command line, stdin is read.

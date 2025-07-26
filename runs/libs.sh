@@ -22,6 +22,7 @@ sudo apt -y install feh
 
 # Media
 sudo apt -y install x264 mpv ffmpeg
+sudo apt -y install evince
 
 #/////////////////////////////////////////////////
 # CONVENIENCE
