@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# This is a make wrapper that searches up the directory tree for the
+# $MAKEFILE, invoking $MAKE when found.
+# Ref: https://github.com/skeeto/dotfiles/blob/master/bin/smake
+
+dir=
+while [ ! -e "$dir${MAKEFILE:-Makefile}" ]; do
+    if [ / -ef $dir. ]; then
+	exit 2;
+    fi
+done
+if [ -z "$dir" ]; then
+    exec "${MAKE:-make}" "$@"
+else
+    exec "${MAKE:-make}" -C ${dir%/} "$@"
+fi
