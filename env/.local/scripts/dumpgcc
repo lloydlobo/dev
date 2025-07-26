@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Ref: https://github.com/skeeto/dotfiles/blob/master/bin/dumpgcc
+exec gcc -dM -E "$@" - < /dev/null
