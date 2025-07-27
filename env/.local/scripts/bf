@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Shows the binary contents of a file in hexadecimal format with interactive scrolling.
+#   bf filename
+#
+#   bf /bin/ls      # View a binary executable
+#   bf ./hello.com  # Inspect a compiled program
+#   bf image.png    # Examine an image file
+#   bf data.bin     # Look at raw data
+#
+# • Requires xxd utility (usually part of vim package)
+# • Useful for reverse engineering, debugging, and binary analysis
+set -xe
+if true; then
+	xxd -g 1 "$1" |
+		fold -w 80 |
+		exec less
+else
+	python3 -c '
+	import sys;
+	f=sys.stdin.buffer.read();
+	for i in range(0, len(f), 16):
+		chunk = f[i:i+16]
+		hexline = " ".join(f"{b:02x}" for b in chunk)
+		print(f"{i:08x}: {hexline}")
+    ' <"$1" |
+		fold -w 80 |
+		exec less
+fi
+
+# Context
+#
+# Ref: https://justine.lol/sizetricks/#look
+#
+# Cosmopolitan is an ex nihilo codebase. I started this project with an empty
+# file and an assembler. Pretty much every byte that's gone into APE binaries
+# since then, I've had some role in either creating and/or monitoring. As such,
+# the two very first tools I wrote with Cosmopolitan Libc were intended to help
+# me do just that.
+#
+#   -rwxr-xr-x 1 501 jart 52K Jun  9 09:08 bing.com (see bing.c)
+#   -rwxr-xr-x 1 501 jart 32K Jun  9 09:08 fold.com (see fold.c)
+#
+#   bing.com <"$1" | fold.com | exec less
+#
+# So whenever I want to take a peek inside a file, I just type a command like:
+#
+#   bf o//examples/hello.com
+#
+# This script lets her inspect binary files interactively:
+# • bing.com reads the file.
+# • fold.com formats the output (e.g. wrapping lines).
+# • less lets her scroll through the result.

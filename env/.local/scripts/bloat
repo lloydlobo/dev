@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Ref: https://justine.lol/sizetricks/#look
+# List symbol names in object files like  .com.dbg file that are the biggest.
+set -e
+nm -C --size "$@" |
+	sort -r |
+	grep ' [bBtTRr] ' |
+	exec less
