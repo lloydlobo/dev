@@ -15,13 +15,46 @@ sudo apt -y update
 sudo apt -y install build-essential libtool-bin python3-dev automake flex bison libglib2.0-dev
 sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip python3-venv
 sudo apt -y install moreutils
-sudo apt -y install clang nasm
 
+#=================================================
+# Compilers
+#=================================================
+sudo apt -y install nasm
+
+sudo apt -y install clang
+if false; then # install gcc-13
+	# WARNING: installing gcc-13 via apt doesn't replace the default /usr/bin/gcc, it installs as /usr/bin/gcc-13.
+	sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+	cat /etc/apt/sources.list.d/ubuntu-toolchain-r-ubuntu-test-*.list
+	apt-cache search gcc | grep '^gcc-[0-9]' | tail
+	sudo apt -y install gcc-13 g++-13
+	# Use update-alternatives to configure default gcc and g++:
+	sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
+	sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130
+	sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 110
+	sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 130
+	# Then run:
+	sudo update-alternatives --config gcc
+	sudo update-alternatives --config g++
+	# Finally, select GCC 13 from the menu.
+	# ...
+	# Verify
+	which gcc
+	gcc --version
+fi
+
+#=================================================
 # UI/UX
+#=================================================
 sudo apt -y install feh
 sudo apt -y install xcowsay acpitool
 
+# Compiling ImHex on Linux
+# See: https://github.com/WerWolv/ImHex/blob/master/dist/compiling/linux.md
+
+#=================================================
 # Media
+#=================================================
 sudo apt -y install x264 mpv ffmpeg
 sudo apt -y install evince
 
