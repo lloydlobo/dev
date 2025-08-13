@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Ref: https://jvns.ca/til/fzf-preview-git-commits/
+# gsfzf: (g)it (s)how | (fzf)
+set -ex
+commit=${1:-HEAD}
+git show --stat=120 --format="" "$commit" | \
+	grep '|' | \
+	fzf --ansi \
+		--disabled \
+		--bind 'ctrl-n:down,ctrl-p:up,Q:abort' \
+		--preview="echo {} | sed 's/ *|.*//' | xargs -I% git show --color=always $commit -- %" \
+		--preview-window=right:60%
