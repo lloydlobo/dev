@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Ref: https://jvns.ca/til/fzf-preview-git-commits/
-# gsfzf: (g)it (s)how | (fzf)
+# gshfzf: (g)it (sh)ow | (fzf)
 set -ex
 commit=${1:-HEAD}
 git show --stat=120 --format="" "$commit" | \
