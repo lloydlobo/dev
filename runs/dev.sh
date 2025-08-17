@@ -11,6 +11,7 @@ cargo install stylua
 
 # =============================================================================
 # Needs development installation of Lua5.1
+#=================================================
 #
 # luarocks installed in ./neovim.sh
 # pushd /tmp/luarocks-3.11.0
@@ -24,8 +25,21 @@ cargo install stylua
 #
 # luarocks install luacheck
 
-# =============================================================================
+#=================================================
+# nvm / node
+#=================================================
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+# WARNING: Post-installation:
+#   - you need to source ~/.zshrc
+#   - remove bash_autocompletion appended to rest of the nvm install script artifact
+nvm install --lts
+nvm use --lts
+node -v
+
+#=================================================
 # Dogfooding
+#=================================================
 
 # git clone https://github.com/lloydlobo/mausam
 # git clone https://github.com/lloydlobo/gitback
