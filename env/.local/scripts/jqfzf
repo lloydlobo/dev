@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Ref: https://jvns.ca/til/fzf-preview-git-commits/
+# jqfzf: (jq) (fzf): “jq playground”
+set -xe
+printf '' | fzf --print-query \
+	--preview "jq -C {q} '$1' 2>&1" \
+	--preview-window=up:80%
