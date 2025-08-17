@@ -5,6 +5,7 @@
 #
 #	DEV_ENV=~/Personal/dev ./run.sh --dry
 #	DEV_ENV=~/Personal/dev ./run.sh docker --dry
+#	DEV_ENV=~/Personal/dev ./run.sh dev.sh --dry
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )";
 
