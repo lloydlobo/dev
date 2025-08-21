@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -e
+#
+# VHS requires ttyd and ffmpeg to be installed and available on your PATH.
+# See https://github.com/charmbracelet/vhs?tab=readme-ov-file#installation
+#
+# Installation:
+#
+# Via go:
+#   go install github.com/charmbracelet/vhs@latest
+#
+# Or docker:
+#   docker run --rm -v $PWD:/vhs ghcr.io/charmbracelet/vhs <cassette>.tape
+#
+# Usage:
+#   ./newvhs <tape-name>
+#
+if [ $# -eq 0 ]; then
+	echo "Usage: $0 <tape-name>"
+	echo "Example: $0 my-demo"
+	exit 1
+fi
+
+readonly is_debug=true
+readonly browser_cache_dir="$HOME/.cache/rod/browser"
+
+report_err() {
+	echo "ERROR: $*" >&2
+}
+
+declare -A dependencies=(
+	["vhs"]="go install github.com/charmbracelet/vhs@latest OR brew install vhs"
+	["ttyd"]="brew install ttyd OR see https://github.com/tsl0922/ttyd"
+	["ffmpeg"]="brew install ffmpeg OR see https://ffmpeg.org/download.html"
+)
+
+missing_deps=()
+for cmd in "${!dependencies[@]}"; do
+	if ! command -v "$cmd" &>/dev/null; then
+		missing_deps+=("$cmd")
+	fi
+done
+
+if [ ${#missing_deps[@]} -gt 0 ]; then
+	set +x 2>/dev/null || true # Disable tracing for clean output.
+	report_err "Missing required dependencies:"
+	for dep in "${missing_deps[@]}"; do
+		report_err "    $dep: ${dependencies[$dep]}"
+	done
+	report_err ""
+	report_err "INFO: Install missing dependencies and try again."
+	exit 1
+fi
+
+if [ ! -d "$browser_cache_dir" ] || [ -z "$(ls -A "$browser_cache_dir" 2>/dev/null)" ]; then
+	echo "WARN:"
+	echo "WARN: ⚠️  FIRST RUN NOTICE:"
+	echo "WARN:     VHS will download Chromium browser (~130MB) to :$browser_cache_dir"
+	echo "WARN:     This is a one-time download and may take a few minutes."
+	echo "WARN:     Subsequent runs will be much faster using the cached browser."
+	echo "WARN:"
+
+fi
+
+if false; then # Get latest version and download for Linux x86_64.
+	VER=$(curl --silent "https://api.github.com/repos/tsl0922/ttyd/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+	wget -O ttyd "https://github.com/tsl0922/ttyd/releases/download/${VER}/ttyd.x86_64"
+	chmod +x ttyd
+	sudo mv ttyd /usr/local/bin/
+fi
+
+if $is_debug; then
+	which vhs || true
+	which ttyd || true
+	which ffmpeg || true
+fi
+
+set -ex # Trace
+
+vhs new "$1" # To get started, install VHS and create a new .tape file.
+
+"${EDITOR:-vi}" "$1.tape" || { # Open the .tape file with your favorite $EDITOR.
+	report_err "Editor was cancelled or failed"
+	echo "INFO: You can edit $1.tape later and run: vhs $1.tape" >&2
+	exit 0
+}
+
+if ! vhs validate "$1.tape"; then # Validate syntax of a tape file.
+	report_err "Tape validation failed. Please check $1.tape for syntax errors"
+	exit 1
+fi
+
+vhs "$1.tape" # Generating a GIF from the tape file...
+
+if $is_debug; then
+	ls -la "${1}".* 2>/dev/null || true
+fi
+
+# vim: set filetype=bash

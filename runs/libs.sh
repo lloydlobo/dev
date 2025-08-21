@@ -70,6 +70,7 @@ sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iosta
 
 go install github.com/air-verse/air@latest
 go install github.com/charmbracelet/glow@latest
+go install github.com/charmbracelet/vhs@latest
 
 cargo install --jobs=4 bat gping navi tealdeer tokei yazi-cli zoxide
 
