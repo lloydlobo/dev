@@ -176,14 +176,14 @@ set $ws10 "10"
 workspace_auto_back_and_forth yes
 
 # workspace back and forth (with/without active container)
-# Ctrl+Alt + j <-- move to right workspace
-# Ctrl+Alt + k --> move to left workspace
+# Win+Ctrl + j <-- move to right workspace
+# Win+Ctrl + k --> move to left workspace
 # See https://github.com/HarshalRathore/my-i3-config/blob/81559e692a7c4176890ac9f07ae1f24904c76cb8/.config/i3/config#L687-L696
-bindsym $alt+z workspace back_and_forth
-bindsym $alt+Control+j workspace prev
-bindsym $alt+Control+k workspace next
-bindsym $alt+Control+Left workspace prev
-bindsym $alt+Control+Right workspace next
+bindsym $mod+z workspace back_and_forth
+bindsym $mod+Control+j workspace prev
+bindsym $mod+Control+k workspace next
+bindsym $mod+Control+Left workspace prev
+bindsym $mod+Control+Right workspace next
 
 # FIXME: Pressing $mod+v inserts this into terminal input
 # force_display_urgency_hint 500 ms
