@@ -18,12 +18,14 @@ order += "load"
 order += "memory"
 order += "disk /"
 
-order += "battery 0" # "battery all"
+# order += "battery 0" # "battery all"
+order += "cpu_temperature 0"
 order += "tztime local"
+order += "volume master"
 
 # 1 CPU
 load {
-        format = "cpu %1min"
+        format = "cpu %5min"
 }
 
 # 2 MEM
@@ -35,7 +37,8 @@ memory {
 
 # 3 DISK
 disk "/" {
-        format = "disks %avail"
+        # format = "disks %avail"
+        format = "disks %free"
 }
 
 battery all {
@@ -44,4 +47,17 @@ battery all {
 
 tztime local {
         format = "%Y-%m-%d %H:%M:%S"
+}
+
+volume master {
+        format = "♪: %volume"
+        format_muted = "♪: muted (%volume)"
+        device = "default"
+        mixer = "Master"
+        mixer_idx = 0
+}
+
+cpu_temperature 0 {
+        format = "T: %degrees °C"
+        path = "/sys/devices/platform/coretemp.0/hwmon/hwmon2/temp1_input"
 }
