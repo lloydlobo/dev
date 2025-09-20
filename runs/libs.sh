@@ -44,6 +44,20 @@ if false; then # install gcc-13
 fi
 
 #=================================================
+# Package Managers
+#=================================================
+curl -LsSf https://astral.sh/uv/install.sh | sh
+if false; then
+	echo 'eval "$(uv generate-shell-completion bash)"' >>~/.bashrc
+	echo 'eval "$(uv generate-shell-completion zsh)"' >>~/.zshrc
+	echo 'eval "$(uvx --generate-shell-completion bash)"' >>~/.bashrc
+	echo 'eval "$(uvx --generate-shell-completion zsh)"' >>~/.zshrc
+fi
+if false; then
+	uv self update
+fi
+
+#=================================================
 # UI/UX
 #=================================================
 sudo apt -y install feh
