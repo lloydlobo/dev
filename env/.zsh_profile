@@ -24,6 +24,15 @@ if false; then
 fi
 
 # =============================================================================
+# MISE-EN-PLACE: for node
+# =============================================================================
+eval "$(mise activate zsh)"
+# 1. mise is not activated, run mise help activate or
+#    read documentation at https://mise.jdx.dev for activation instructions.
+#    Alternatively, add the shims directory ~/.local/share/mise/shims to PATH.
+#    Using the shims directory is preferred for non-interactive setups.
+
+# =============================================================================
 # FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
@@ -37,13 +46,6 @@ export PATH=$GOROOT/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
 # For Zed binary installed via `curl -f https://zed.dev/install.sh | sh`
 export PATH=$HOME/.local/bin:$PATH
-
-# =============================================================================
-# NVM / Node
-# =============================================================================
-export NVM_DIR="$HOME/.config/nvm" # Thu Sep 25 03:46:07 PM IST 2025
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # =============================================================================
 # Bindings

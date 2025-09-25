@@ -29,13 +29,23 @@ cargo install stylua
 # nvm / node
 #=================================================
 
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-# WARNING: Post-installation:
-#   - you need to source ~/.zshrc
-#   - remove bash_autocompletion appended to rest of the nvm install script artifact
-nvm install --lts
-nvm use --lts
-node -v
+if false; then
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+  # WARNING: Post-installation:
+  #   - you need to source ~/.zshrc
+  #   - remove bash_autocompletion appended to rest of the nvm install script artifact
+  nvm install --lts
+  nvm use --lts
+  node -v
+fi
+
+#
+# mise
+#
+curl https://mise.run | sh
+mise use -g usage # mise: auto-completion
+# added mise plugin to ohmzsh:
+#     plugins=(git mise)
 
 #=================================================
 # Dogfooding

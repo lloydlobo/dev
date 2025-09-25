@@ -70,7 +70,14 @@ ENABLE_CORRECTION="true"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git asdf)
+# plugins=(git asdf)
+plugins=(git mise)
+# # Otherwise, look where zsh search for completions with
+# echo $fpath | tr ' ' '\n'
+#
+# # if you installed zsh with `apt-get` for example, this will work:
+# mkdir -p /usr/local/share/zsh/site-functions
+# mise completion zsh  > /usr/local/share/zsh/site-functions/_mise
 
 # plugins=(fzf git)
 # [oh-my-zsh] fzf plugin: Cannot find fzf installation directory
