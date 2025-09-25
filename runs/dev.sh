@@ -43,9 +43,16 @@ fi
 # mise
 #
 curl https://mise.run | sh
-mise use -g usage # mise: auto-completion
-# added mise plugin to ohmzsh:
-#     plugins=(git mise)
+if true; then
+  mise use -g usage # requires `❯ usage  A specification for CLIs` for auto-completion
+  # .zshrc
+  #     plugins=(git mise)  # added mise plugin to ohmzsh:
+fi
+
+#
+# node
+#
+mise use -g node@22 # https://mise.jdx.dev/lang/node.html#node - installs the latest version of node-20.x and makes it the global default
 
 #=================================================
 # Dogfooding
