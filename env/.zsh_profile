@@ -39,6 +39,13 @@ export PATH=$HOME/go/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
 
 # =============================================================================
+# NVM / Node
+# =============================================================================
+export NVM_DIR="$HOME/.config/nvm" # Thu Sep 25 03:46:07 PM IST 2025
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# =============================================================================
 # Bindings
 bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xprofile)
 
@@ -48,8 +55,7 @@ bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xp
 
 # =============================================================================
 # Aliases
-alias gs="git status --short --branch"
-alias gt='NODE_OPTIONS="--no-deprecation" gt'
+# alias gs="git status --short --branch"
 alias lg="lazygit"
 alias vim="nvim"
 alias vimog="vim"
@@ -94,3 +100,4 @@ addToPathFront $HOME/.local/scripts/
 # addToPathFront $HOME/Personal/sumneko/bin/
 addToPath $HOME/.cargo/bin/
 addToPathFront /usr/local/go/bin/
+
