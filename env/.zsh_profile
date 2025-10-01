@@ -1,7 +1,9 @@
 # file: .zsh_profile
 #
-# Sources:
+# $ DEV_ENV=~/Personal/dev ./dev-env.sh
+# $ DEV_ENV=~/Personal/dev ./dev-env.sh --dry
 #
+# Sources:
 #	- https://github.com/ThePrimeagen/dev/blob/master/env/.zsh_profile
 
 export XDG_CONFIG_HOME=$HOME/.config
@@ -31,6 +33,12 @@ eval "$(mise activate zsh)"
 #    read documentation at https://mise.jdx.dev for activation instructions.
 #    Alternatively, add the shims directory ~/.local/share/mise/shims to PATH.
 #    Using the shims directory is preferred for non-interactive setups.
+
+# =============================================================================
+# uv: Python package and project manager
+# =============================================================================
+eval "$(uv generate-shell-completion zsh)"
+eval "$(uvx --generate-shell-completion zsh)"
 
 # =============================================================================
 # FZF
@@ -102,4 +110,3 @@ addToPathFront $HOME/.local/scripts/
 # addToPathFront $HOME/Personal/sumneko/bin/
 addToPath $HOME/.cargo/bin/
 addToPathFront /usr/local/go/bin/
-
