@@ -92,6 +92,10 @@ cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies
 
 cargo install --jobs=4 --locked serpl
 
+uv tool list # starting... (installs in  /home/user/.local/bin/)
+uv tool install pre-commit
+uv tool list # ...finished
+
 #/////////////////////////////////////////////////
 # Dynamic code analysis
 #/////////////////////////////////////////////////
