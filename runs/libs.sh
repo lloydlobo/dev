@@ -80,19 +80,20 @@ sudo apt -y install entr lnav plocate redshift rsibreak yt-dlp # redshift -PO 36
 sudo apt -y install expect  # https://core.tcl.tk/expect/        Provides: unbuffer
 sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iostat
 
-#sudo apt -y install ffmpeg 7zip jq poppler-utils fd-find ripgrep fzf zoxide imagemagick
+#                             sudo apt -y install ffmpeg 7zip jq poppler-utils fd-find ripgrep fzf zoxide imagemagick
 
 go install github.com/air-verse/air@latest
 go install github.com/charmbracelet/glow@latest
 go install github.com/charmbracelet/vhs@latest
+go install github.com/cheat/cheat/cmd/cheat@latest
 
 cargo install --jobs=4 bat gping navi tealdeer tokei yazi-cli zoxide
-
 cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
-
 cargo install --jobs=4 --locked serpl
 
-uv tool list # starting... (installs in  /home/user/.local/bin/)
+uv tool list           # starting... (installs in  /home/user/.local/bin/)
+uv tool install httpie # Installed 3 executables: http, httpie, https  #  $ unbuffer http https://example.com | sponge | bat
+uv tool install marimo
 uv tool install pre-commit
 uv tool list # ...finished
 
@@ -103,6 +104,7 @@ sudo apt -y install valgrind afl++
 
 # perf *************************
 sudo apt -y install linux-tools-"$(uname -r)"
+
 # Change these kernel variables to allow Perf to collect information without root privileges.
 # Keep the settings across system reboots:
 # - See [Kernel variables documentation](https://www.kernel.org/doc/Documentation/sysctl/kernel.txt)
