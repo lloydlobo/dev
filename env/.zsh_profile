@@ -57,7 +57,9 @@ export PATH=$HOME/.local/bin:$PATH
 
 # =============================================================================
 # Bindings
+bindkey -s '^E' 'vim $(fzf)\n' # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
 bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xprofile)
+# bindkey -s '^F' 'fzfclip\n' # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
 
 # =============================================================================
 # Rust btw
@@ -65,10 +67,17 @@ bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xp
 
 # =============================================================================
 # Aliases
-# alias gs="git status --short --branch"
+alias fd="rg --files"  # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
+alias gs="git status --short --branch"
 alias lg="lazygit"
 alias vim="nvim"
-alias vimog="vim"
+alias vimog="vim.tiny"
+alias vim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'
+# | Example:      | `alias nvim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'` |
+# | Config Path:  | `~/.config/nvim-kickstart`                                  |
+# | Data Path:    | `~/.local/share/nvim-kickstart`                             |
+alias tr="python3 -m http.server 8000"
+alias wtr="curl -Ss wttr.in | head -n -1"
 
 # =============================================================================
 # Cat Funcs
