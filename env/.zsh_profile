@@ -57,9 +57,11 @@ export PATH=$HOME/.local/bin:$PATH
 
 # =============================================================================
 # Bindings
-bindkey -s '^E' 'vim $(fzf)\n' # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
+# Why does ^t trigger act like fzf?
+
+bindkey -s '^E' 'vim $(fzf)\n'  # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
 bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xprofile)
-# bindkey -s '^F' 'fzfclip\n' # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
+bindkey -s ^x 'fzfclip\n'  # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
 
 # =============================================================================
 # Rust btw

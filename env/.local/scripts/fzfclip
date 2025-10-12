@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Usage: script [--no-quotes] | Select item with fzf and copy to clipboard
+
+readonly CLIPBOARD_UTILS=(        # clipboard utilities to try (in order of preference)
+    "xclip -selection clipboard"  # X11 (Linux)
+    "xsel --clipboard --input"    # X11 alternative
+    "wl-copy"                     # Wayland (Linux)
+    "pbcopy"                      # macOS
+    "clip.exe"                    # Windows (WSL)
+    "copyq copy -"                # Cross-platform clipboard manager
+)
+
+clip_cmd=  # idiomatic empty string
+for cmd in "${CLIPBOARD_UTILS[@]}"; do
+    command -v "${cmd%% *}" &>/dev/null && clip_cmd=$cmd && break
+done
+
+[[ ${1-} == --no-quotes ]] && readonly fmt=%s || readonly fmt='"%s"'        # inside [[ quotes/: aren't needed
+
+readonly result=$(fzf) || exit 0                                            # exit gracefully if fzf is cancelled (Ctrl+C or Esc)
+
+printf "$fmt\n" "$result" | eval "${clip_cmd:?No clipboard utility found}"  # eval needed to handle commands with arguments (e.g., "xsel --clipboard --input")
+
+[[ -t 1 ]] && printf '✓ Copied: "%s"\n' "${result//\"/\\\"}" >&2            # show confirmation if interactive tty (not piped or redirected)
