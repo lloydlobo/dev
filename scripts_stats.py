@@ -2,45 +2,39 @@
 # requires-python = ">=3.14"
 # dependencies = [
 #   "rich",
-#   "icecream",
 # ]
 # ///
-
-# Usage:
-#   :!uv run scripts_stats.py --script
-# Format:
-#   :!uvx ruff format scripts_stats.py
-
 from collections import Counter
 from pathlib import Path
 from typing import BinaryIO
 
 from rich.console import Console
 from rich.table import Table
-from icecream import ic
 
 
+# Streaming	Line-by-line reading, safe for large files
 def parse_history_gen(f: BinaryIO):
-    """Remove zsh extended history timestamp
-    b': 1739424127:0;zoxide init'\\n  ->  zoxide init
-    """
+    """Remove zsh extended history timestamp (b': 1739424127:0;zoxide init'\\n  ->  zoxide init)"""
     for line in f:  # note that empty lines have no semicolon
         if cmd := line.partition(b";")[2].strip(b"'\r\n"):
             try:
                 yield cmd.decode("utf-8")  # ..., errors="replace"
-            except UnicodeDecodeError:  # skip unreadable lines
-                pass
+            except UnicodeDecodeError:
+                pass  # skip unreadable lines
 
 
-def run_main() -> None:
+def main() -> None:
     home = Path.home()  # -> /home/user
     scripts_dir = home / ".local" / "scripts"
-    scripts: set[str] = {p.stem for p in scripts_dir.iterdir() if p.is_file()}
+    history_path = home / ".zsh_history"
 
-    with open(home / ".zsh_history", "rb") as f:
-        cmds = parse_history_gen(f)
-        cmds = (Path(parts[0]).stem for c in cmds if (parts := c.split()))
-        counts = Counter(name for name in cmds if name in scripts)
+    scripts: set[str] = {p.stem for p in scripts_dir.iterdir() if p.is_file()}
+    with history_path.open("rb") as f:
+        commands = parse_history_gen(f)
+        commands = (
+            Path(part).stem for c in commands if (part := c.split(maxsplit=1)[0])
+        )
+        counts = Counter(name for name in command_names if name in scripts)
 
     table = Table(title="Script Usage Stats", show_lines=False)
     table.add_column("Rank", justify="right", style="cyan")
@@ -53,14 +47,16 @@ def run_main() -> None:
     Console().print(table)
 
 
-def main() -> None:
-    run_main()
-
-
 if __name__ == "__main__":
     main()
 
 """
+Format:
+  :!uvx ruff format scripts_stats.py
+
+Usage:
+  :!uv run scripts_stats.py --script
+
         Script Usage Stats
 ┏━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━┓
 ┃ Rank ┃ Script           ┃ Count ┃
@@ -84,7 +80,6 @@ if __name__ == "__main__":
 │   17 │ kr               │     1 │
 │   18 │ notify-battery   │     1 │
 └──────┴──────────────────┴───────┘
-
 """
 
 """
