@@ -1,20 +1,23 @@
 # /// script
 # requires-python = ">=3.14"
 # dependencies = [
+#   "rich",
 #   "icecream",
 # ]
 # ///
+
+# Usage:
+#   :!uv run scripts_stats.py --script
+# Format:
+#   :!uvx ruff format scripts_stats.py
+
 from collections import Counter
 from pathlib import Path
 from typing import BinaryIO
 
+from rich.console import Console
+from rich.table import Table
 from icecream import ic
-
-# Usage:
-#   :!uv run scripts_stats.py --script
-#
-# Format:
-#   :!uvx ruff format scripts_stats.py
 
 
 def parse_history_gen(f: BinaryIO):
@@ -30,18 +33,24 @@ def parse_history_gen(f: BinaryIO):
 
 
 def run_main() -> None:
-    home_path = Path.home()  # -> /home/user
-    scripts_path = home_path / ".local" / "scripts"  # -> /home/user/.local/scripts
+    home = Path.home()  # -> /home/user
+    scripts_dir = home / ".local" / "scripts"
+    scripts: set[str] = {p.stem for p in scripts_dir.iterdir() if p.is_file()}
 
-    scripts: set[str] = {path.stem for path in scripts_path.iterdir() if path.is_file()}
-
-    with open(home_path / ".zsh_history", "rb") as f:  # -> /home/user/.zsh_history
+    with open(home / ".zsh_history", "rb") as f:
         cmds = parse_history_gen(f)
-        cmds = (Path(parts[0]).resolve().stem for cmd in cmds if (parts := cmd.split()))  # fmt: skip
+        cmds = (Path(parts[0]).stem for c in cmds if (parts := c.split()))
         counts = Counter(name for name in cmds if name in scripts)
 
-    for script, count in counts.most_common(30):
-        ic(script, count)
+    table = Table(title="Script Usage Stats", show_lines=False)
+    table.add_column("Rank", justify="right", style="cyan")
+    table.add_column("Script", style="green")
+    table.add_column("Count", justify="right", style="magenta")
+
+    for rank, (script, count) in enumerate(counts.most_common(30), 1):
+        table.add_row(str(rank), script, str(count))
+
+    Console().print(table)
 
 
 def main() -> None:
@@ -52,24 +61,30 @@ if __name__ == "__main__":
     main()
 
 """
-ic| script: 'pomo', count: 179
-ic| script: 'tmux-sessionizer', count: 120
-ic| script: 'keep', count: 94
-ic| script: 'newvhs', count: 54
-ic| script: 'bloat', count: 51
-ic| script: 'bf', count: 26
-ic| script: 'gshfzf', count: 23
-ic| script: 'fzfclip', count: 20
-ic| script: 'asm', count: 9
-ic| script: 'pdf', count: 7
-ic| script: 'smake', count: 6
-ic| script: 'rand64', count: 5
-ic| script: 'notify-date', count: 3
-ic| script: 'dumpgcc', count: 2
-ic| script: 'jqfzf', count: 2
-ic| script: 'debugbreak', count: 1
-ic| script: 'kr', count: 1
-ic| script: 'notify-battery', count: 1
+        Script Usage Stats
+┏━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━┓
+┃ Rank ┃ Script           ┃ Count ┃
+┡━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━┩
+│    1 │ pomo             │   179 │
+│    2 │ tmux-sessionizer │   120 │
+│    3 │ keep             │    94 │
+│    4 │ newvhs           │    54 │
+│    5 │ bloat            │    51 │
+│    6 │ bf               │    26 │
+│    7 │ gshfzf           │    23 │
+│    8 │ fzfclip          │    20 │
+│    9 │ asm              │     9 │
+│   10 │ pdf              │     7 │
+│   11 │ smake            │     6 │
+│   12 │ rand64           │     5 │
+│   13 │ notify-date      │     3 │
+│   14 │ dumpgcc          │     2 │
+│   15 │ jqfzf            │     2 │
+│   16 │ debugbreak       │     1 │
+│   17 │ kr               │     1 │
+│   18 │ notify-battery   │     1 │
+└──────┴──────────────────┴───────┘
+
 """
 
 """
