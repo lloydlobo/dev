@@ -76,6 +76,7 @@ sudo apt -y install evince
 # CONVENIENCE
 #/////////////////////////////////////////////////
 sudo apt -y install entr lnav plocate redshift rsibreak yt-dlp # redshift -PO 3600
+sudo apt -y install timewarrior
 
 sudo apt -y install expect  # https://core.tcl.tk/expect/        Provides: unbuffer
 sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iostat

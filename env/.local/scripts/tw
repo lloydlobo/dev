@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Ref: https://youtu.be/fpn3ev9hY_4?si=dWDR03jPnxcyJHZO&t=736 — Sylvan Franklin
+
+# FIXME: This interrupts execution on fzf
+# set -euo pipefail # exit on error, undefined vars, pipe failures
+#   FIXME: still failing
+#   set +e # Allow fzf to fail without exiting the script:
+#     ... do work
+#   set -e
+
+readonly CATEGORIES=(
+    "PROGRAMMING"
+    "DSA" # study
+    "WORKFLOW"
+    "CHILL"
+    "STORMY"
+    "WASTED"
+    "STOP" # stops tracking
+)
+
+readonly LOG_FILE="$HOME/tw_time_tracking.log"
+
+selected=$(printf "%s\n" "${CATEGORIES[@]}" | fzf --prompt="Select category: " \
+    --height=40% --border --ansi --reverse)
+
+if [[ -z "$selected" ]]; then # if user cancels fzf, exit gracefully 
+    echo "No category selected. Exiting."
+    exit 0
+fi
+
+timew stop &>/dev/null # stop previous timer if running
+
+if [[ "$selected" == "STOP" ]]; then # handle STOP or start timer
+    tmux set -g status-right ""
+    echo "$(date --utc +%Y-%m-%dT%H:%M:%S%Z) - STOP" >> "$LOG_FILE"
+else
+    timew start "$selected"
+
+    case "$selected" in
+        PROGRAMMING)  color="blue" ;;
+        DSA)          color="green" ;;
+        WORKFLOW)     color="cyan" ;;
+        CHILL)        color="red" ;;
+        STORMY)       color="yellow" ;;
+        WASTED)       color="white" ;;
+        *)            color="default" ;;
+    esac
+
+    tmux set -g status-right "#[fg=$color,bold]$selected"
+    echo "$(date --utc +%Y-%m-%dT%H:%M:%S%Z) - START - $selected" >> "$LOG_FILE"
+fi
+
+# vim:filetype=bash:
+# vim:tw=78:ts=4:sw=4:et:ft=help:norl:
