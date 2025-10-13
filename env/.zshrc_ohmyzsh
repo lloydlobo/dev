@@ -1,0 +1,180 @@
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+
+# Path to your Oh My Zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time Oh My Zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+ZSH_THEME="robbyrussell"
+
+# Set list of themes to pick from when loading at random
+# Setting this variable when ZSH_THEME=random will cause zsh to load
+# a theme from this variable instead of looking in $ZSH/themes/
+# If set to an empty array, this variable will have no effect.
+# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
+
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
+
+# Uncomment one of the following lines to change the auto-update behavior
+# zstyle ':omz:update' mode disabled  # disable automatic updates
+# zstyle ':omz:update' mode auto      # update automatically without asking
+# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+
+# Uncomment the following line to change how often to auto-update (in days).
+# zstyle ':omz:update' frequency 13
+
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS="true"
+
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
+
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment the following line to enable command auto-correction.
+ENABLE_CORRECTION="true"
+
+# Uncomment the following line to display red dots whilst waiting for completion.
+# You can also set it to another string to have that shown instead of the default red dots.
+# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
+# COMPLETION_WAITING_DOTS="true"
+
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+# plugins=(git asdf)
+plugins=(git mise)
+# # Otherwise, look where zsh search for completions with
+# echo $fpath | tr ' ' '\n'
+#
+# # if you installed zsh with `apt-get` for example, this will work:
+# mkdir -p /usr/local/share/zsh/site-functions
+# mise completion zsh  > /usr/local/share/zsh/site-functions/_mise
+
+# plugins=(fzf git)
+# [oh-my-zsh] fzf plugin: Cannot find fzf installation directory
+# Please add `export FZF_BASE=/path/to/fzf/install/dir` to your .zshrc
+
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
+
+# export MANPATH="/usr/local/man:$MANPATH"
+
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='nvim'
+fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch $(uname -m)"
+
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+source ~/.zsh_profile
+
+# =============================================================================
+#
+# To initialize zoxide, add this to your shell configuration file (usually ~/.zshrc):
+eval "$(zoxide init zsh)"
+
+# =============================================================================
+#
+# Yazi: Shell wrapper
+# We suggest using this y shell wrapper that provides the ability to change the
+# current working directory when exiting Yazi.
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
+
+# # Ref: https://scottspence.com/posts/speeding-up-my-zsh-shell#how-to-profile-your-zsh
+# # Ref: https://blog.askesis.pl/post/2017/04/how-to-debug-zsh-startup-time.html
+#
+# ENABLE_ZPROF=false
+#
+# [[ $ENABLE_ZPROF == true ]] && zmodload zsh/zprof # add this to the TOP of your .zshrc
+# # ...
+# # ...
+# # ...
+# [[ $ENABLE_ZPROF == true ]] && zprof # add this to the BOTTOM of your .zshrc
+#
+# num  calls                time                       self            name
+# -----------------------------------------------------------------------------------
+#  1)   16        3666.95   229.18   46.45%   3666.95   229.18   46.45%  compdump
+#  2)   16        5979.43   373.71   75.75%   1098.01    68.63   13.91%  compinit
+#  3) 13072        1022.08     0.08   12.95%   1022.08     0.08   12.95%  compdef
+#  4)   64         786.58    12.29    9.96%    786.58    12.29    9.96%  _mise_hook
+#  5)  368         861.87     2.34   10.92%    601.56     1.63    7.62%  _omz_source
+#  6)   16         276.68    17.29    3.51%    276.68    17.29    3.51%  zrecompile
+#  7)   32         209.31     6.54    2.65%    209.31     6.54    2.65%  compaudit
+#  8)   32          71.83     2.24    0.91%     71.83     2.24    0.91%  omz_termsupport_cwd
+#  9)   16          46.37     2.90    0.59%     46.37     2.90    0.59%  (anon)
+# 10)   16          18.87     1.18    0.24%     18.87     1.18    0.24%  test-ls-args
+# 11)   16          65.10     4.07    0.82%     18.73     1.17    0.24%  handle_update
+# 12)   32          20.06     0.63    0.25%     14.53     0.45    0.18%  _omz_async_request
+# 13)  128          12.09     0.09    0.15%     12.09     0.09    0.15%  is-at-least
+# 14)   32           9.32     0.29    0.12%      9.32     0.29    0.12%  _omz_async_callback
+# 15)   30          12.08     0.40    0.15%      8.71     0.29    0.11%  omz_termsupport_preexec
+# 16)   16           7.05     0.44    0.09%      7.05     0.44    0.09%  colors
+# 17)   79           5.34     0.07    0.07%      5.34     0.07    0.07%  add-zsh-hook
+# 18)   62           5.05     0.08    0.06%      5.05     0.08    0.06%  title
+# 19)   16           4.81     0.30    0.06%      4.81     0.30    0.06%  url-quote-magic
+# 20)   30           3.46     0.12    0.04%      3.46     0.12    0.04%  zle-line-finish
+# 21)   64           1.27     0.02    0.02%      1.27     0.02    0.02%  is_plugin
+# 22)   15           2.70     0.18    0.03%      0.92     0.06    0.01%  _defer_async_git_register
+# 23)   48           0.89     0.02    0.01%      0.89     0.02    0.01%  is_theme
+# 24)   32           0.89     0.03    0.01%      0.89     0.03    0.01%  zle-line-init
+# 25)   32           2.44     0.08    0.03%      0.74     0.02    0.01%  omz_termsupport_precmd
+# 26)   32           0.59     0.02    0.01%      0.59     0.02    0.01%  addToPathFront
+# 27)   15           0.52     0.03    0.01%      0.52     0.03    0.01%  _omz_register_handler
+# 28)   32           0.29     0.01    0.00%      0.29     0.01    0.00%  env_default
+# 29)   16           0.27     0.02    0.00%      0.27     0.02    0.00%  bashcompinit
+# 30)   16           0.20     0.01    0.00%      0.20     0.01    0.00%  addToPath

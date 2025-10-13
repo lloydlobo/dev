@@ -61,6 +61,8 @@ export PATH=$HOME/.local/bin:$PATH
 # fzf: default mappings
 #   <COMMAND> ^t
 #   <COMMAND> ** (<TAB>)
+#   Ctrl+R: fuzzy search through your history
+#   Alt+C: lets you jump through folders
 
 bindkey -s '^E' 'vim $(fzf)\n'  # (vim **) ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
 bindkey -s ^f "tmux-sessionizer.sh\n" # requires scripts to be in PATH (see ./xprofile)
@@ -72,9 +74,11 @@ bindkey -s ^x 'fzfclip\n'  # ref: https://github.com/yobibyte/yobitools/blob/mai
 
 # =============================================================================
 # Aliases
+alias c="clear"
 alias fd="rg --files"  # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
 alias gs="git status --short --branch"
 alias lg="lazygit"
+alias ls="ls --color"
 alias vim="nvim"
 alias vimog="vim.tiny"
 alias vim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'
