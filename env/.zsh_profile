@@ -12,6 +12,9 @@ export GTK_THEME=Adwaita:dark nautilus
 gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 # exec_always --no-startup-id exec export LANG=en_US.UTF-8
 
+# export MANPATH="/usr/local/man:$MANPATH"
+# export LANG=en_US.UTF-8  # you may need to manually set your language environment
+
 PERSONAL=$XDG_CONFIG_HOME/Personal
 VIM=nvim
 #DEV_ENV=$HOME/dev	 			# Note: "dev" is at $HOME/Personal/dev; so move it to $HOME?
