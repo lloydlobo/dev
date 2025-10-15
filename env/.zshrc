@@ -121,21 +121,16 @@ HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history
 SAVEHIST=$HISTSIZE
 HISTDUP=erase
 
-setopt appendhistory
-setopt hist_find_no_dups
-setopt hist_ignore_all_dups
+setopt appendhistory # append rather than overwrite history
+setopt hist_find_no_dups  # don't show duplicates in search
+setopt hist_ignore_all_dups # delete old duplicates
 setopt hist_ignore_dups
-setopt hist_ignore_space
-setopt hist_save_no_dups
-setopt sharehistory
+setopt hist_ignore_space # ignore commands starting with space
+setopt hist_reduce_blanks # remove superfluous blanks
+setopt hist_save_no_dups # don't save duplicates
+setopt sharehistory # share history across sessions
 
-# setopt appendhistory          # Append rather than overwrite history
-# setopt sharehistory          # Share history across sessions
-# setopt hist_ignore_space     # Ignore commands starting with space
-# setopt hist_ignore_all_dups  # Delete old duplicates
-# setopt hist_save_no_dups     # Don't save duplicates
-# setopt hist_find_no_dups     # Don't show duplicates in search
-# setopt hist_reduce_blanks    # Remove superfluous blanks
+set -o vi # see also: zvm (vi mode plugin)
 
 # - - - - - - - - - - - - - - - - - - - -
 # Completion styling
