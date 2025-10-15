@@ -49,12 +49,18 @@ eval "$(uvx --generate-shell-completion zsh)"
 
 # =============================================================================
 # Exports env variables
-# export GOPATH=$HOME/.local/go # unimplemented
 export DEV_ENV_HOME="$HOME/Personal/dev"
 export GIT_EDITOR=$VIM
+
+#export GOPATH=$HOME/.local/go # (unimplemented)
 export GOROOT=/usr/local/go
 export PATH=$GOROOT/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
+
+export DOTNET_CLI_TELEMETRY_OPTOUT=true # opt-out of telemetry (.NET tools collects usage data)
+export DOTNET_ROOT="$HOME/.dotnet" # .NET SDK (installed via dotnet-install.sh)
+export PATH=$DOTNET_ROOT:$PATH
+
 # For Zed binary installed via `curl -f https://zed.dev/install.sh | sh`
 export PATH=$HOME/.local/bin:$PATH
 
