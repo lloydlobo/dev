@@ -2,6 +2,7 @@
 # requires-python = ">=3.14"
 # dependencies = [
 #   "pandas",
+#   "polars",
 #   "rich",
 #   "icecream",
 # ]
@@ -10,10 +11,13 @@
 import argparse  # /home/user/.local/share/nvim-kickstart/mason/packages/basedpyright/venv/lib/python3.10/site-packages/basedpyright/dist/typeshed-fallback/stdlib/argparse.pyi
 import sys  # /home/user/.local/share/nvim-kickstart/mason/packages/basedpyright/venv/lib/python3.10/site-packages/basedpyright/dist/typeshed-fallback/stdlib/sys/__init__.pyi
 from collections import Counter
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
-from typing import BinaryIO
+from typing import BinaryIO, Self
 
 import pandas as pd
+import polars as pl
 from icecream import ic
 from rich import print as rprint
 from rich.console import Console
@@ -39,62 +43,127 @@ def parse_history_gen(f: BinaryIO):
                 continue  # skip unreadable lines
 
 
-def run_plugin_dataframe() -> None:
-    limit = 20
+@dataclass(slots=True)
+class Command:
+    """Represents one zsh extended history entry."""
 
+    timestamp: datatime
+    duration: int | None
+    exit_code: int | None
+    cmd: str | None = None
+    args: str | None
+    raw: str
+
+    @classmethod
+    def from_line(cls, line: bytes) -> Self | None:
+        if not line.startswith(b": "):
+            return None  # skip malformed or plain history lines
+
+        _, rest = line.split(b": ", 1)
+        header, cmd_part = rest.split(b";", 1)
+        header_fields = header.split(b":")
+        cmd_bytes = cmd_part.strip(b"'\r\n")
+
+        ts = datetime.fromtimestamp(int(header_fields[0]))
+        duration = (int(header_fields[1]) if len(header_fields) > 1 and header_fields[1].isdigit() else None)  # fmt: skip
+        exit_code = (int(header_fields[2]) if len(header_fields) > 2 and header_fields[2].isdigit() else None)  # fmt: skip
+
+        raw = cmd_bytes.decode("utf-8", errors="replace")
+        if not raw:
+            return None
+        parts = raw.split(maxsplit=1)
+        cmd = parts[0]
+        args = parts[1] if len(parts) > 1 else None
+
+        return cls(
+            timestamp=ts,
+            duration=duration,
+            exit_code=exit_code,
+            cmd=cmd,
+            args=args,
+            raw=raw,
+        )
+
+
+def run_plugin_dataframe() -> None:
+    """
+    csv_files = glob.glob("dataframes/2023*.csv")
+    dfs = [pd.read_csv(f) for f in csv_files]
+    orders = pd.concat(dfs, axis=0, ignore_index=True)
+    products = pd.read_csv("dataframes/products.csv")
+    df = orders.merge(products, on="product_id", how="left")
+    top = (df.groupby("product_name", as_index=False)["total"]
+        .sum() .sort_values("total", ascending=False) .head(10))
+    top.to_json("bestsellers_pandas.json", orient="records")
+    """
+    match 1:
+        case 1:
+            _run_plugin_dataframe_polars_sql()
+        case 2:
+            _run_plugin_dataframe_pandas()
+
+
+def _run_plugin_dataframe_polars_sql() -> None:
+    limit = 20
+    home = Path.home()
+    scripts_dir = home / ".local" / "scripts"
+    history_path = home / ".zsh_history"
+    scripts: set[str] = {p.stem for p in scripts_dir.iterdir() if p.is_file()}
+    ic(scripts)
+    # Ref: https://kestra.io/blogs/2023-08-11-dataframes#polars
+    with history_path.open("rb") as f:
+        ctx = pl.SQLContext(
+            commands=pl.concat(list(parse_history_gen(f))),
+            eager_execution=False,
+        )
+        ic(ctx)
+
+
+def _run_plugin_dataframe_pandas() -> None:
+    limit = 20
     home = Path.home()  # -> /home/user
     scripts_dir = home / ".local" / "scripts"
     history_path = home / ".zsh_history"
-
     scripts: set[str] = {p.stem for p in scripts_dir.iterdir() if p.is_file()}
-
     with history_path.open("rb") as f:
         commands = parse_history_gen(f)  # lazy generator
-
         df = pd.DataFrame({"raw": commands})
         df["cmd"] = df["raw"].str.split().str[0]
         df = df[df["cmd"].isin(scripts)]
-
         counts = df["cmd"].value_counts().head(limit).reset_index()
         counts.columns = ["script", "count"]
-
     console = Console()
-    console.print(counts) -- KISS; dataframes are good enough
+    console.print(counts)  # KISS; dataframes are good enough
 
 
 def run_plugin_counter() -> None:
     limit = 20
-
     home = Path.home()  # -> /home/user
     scripts_dir = home / ".local" / "scripts"
     history_path = home / ".zsh_history"
-
     scripts: set[str] = {p.stem for p in scripts_dir.iterdir() if p.is_file()}
-
     with history_path.open("rb") as f:
         commands = parse_history_gen(f)  # lazy generator
-
         commands = (
             Path(part).stem
             for c in commands
             if (parts := c.split(maxsplit=1)) and (part := parts[0])
         )
         counts = Counter(name for name in commands if name in scripts)
-
     table = Table(title="Script Usage Stats", show_lines=False)
     table.add_column("Rank", justify="right", style="cyan")
     table.add_column("Script", style="green")
     table.add_column("Count", justify="right", style="magenta")
-
     for rank, (script, count) in enumerate(counts.most_common(limit), start=1):
         table.add_row(str(rank), script, str(count))
-
     console = Console()
     Console().print(table)
 
 
 def main():
-    parser = argparse.ArgumentParser( description="Analyze local script usage from zsh history.")
+    parser = argparse.ArgumentParser(
+        description="Analyze local script usage from zsh history."
+    )
     parser.add_argument(
         "--mode",
         choices=["dataframe", "counter"],
@@ -108,19 +177,6 @@ def main():
         help="Number of top scripts to display",
     )
     args = parser.parse_args()
-    """
-        $ uv run --script scripts_stats.py --help
-        usage: scripts_stats.py [-h] [--mode {dataframe,counter}] [--limit LIMIT]
-
-        Analyze local script usage from zsh history.
-
-        options:
-          -h, --help            show this help message and exit
-          --mode {dataframe,counter}
-                                Choose implementation mode: pandas dataframe or Counter
-          --limit LIMIT         Number of top scripts to display
-    """
-
     match args.mode:
         case "counter":
             run_plugin_counter()
