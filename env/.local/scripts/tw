@@ -1,40 +1,60 @@
 #!/usr/bin/env bash
 # Ref: https://youtu.be/fpn3ev9hY_4?si=dWDR03jPnxcyJHZO&t=736 — Sylvan Franklin
-set -euo pipefail # exit on error, undefined vars, pipe failures
+#
 
+set -euo pipefail # exit on error, undefined vars, pipe failures
 trap 'echo "[$(basename "$0"):$LINENO] Error occurred" >&2; exit 1' ERR
 
 # === Config ===
+
 readonly LOG_FILE="${HOME}/.tw.jsonl"
 readonly LOG_ROTATED="${LOG_FILE}.old"
 readonly MAX_LOG_LINES=5000 # before rotation
+
 readonly CATEGORIES=(PROGRAMMING DSA WORKFLOW CHILL STORMY WASTED STOP) 
 declare -Ar COLORS=([PROGRAMMING]=blue [DSA]=green [WORKFLOW]=cyan [CHILL]=red [STORMY]=yellow [WASTED]=white)  # -r for immutability
 
 # === Helpers ===
-die() { echo "[$(basename "$0"):$LINENO] $1" >&2; exit 1; }
-get_timestamp() { date -u +%Y-%m-%dT%H:%M:%SZ; } # support for date: GNU {--utc, -u} vs macOS BSD {-u}
+
+die() {
+    echo "[$(basename "$0"):$LINENO] $1" >&2;
+    exit 1;
+}
+
+get_timestamp() { # support for date: GNU {--utc, -u} vs macOS BSD {-u}
+    date -u +%Y-%m-%dT%H:%M:%SZ;
+}
+
 rotate_logs() {
     [[ -f "$LOG_FILE" ]] || return 0
-    local lines
-    lines=$(wc -l < "$LOG_FILE")
+    # TODO:
+    #       local log_rotated="${LOG_FILE}.$(date +%Y%m%d)"
+    #       mv "$LOG_FILE" "$log_rotated"
+    #       gzip "$log_rotated"
+    local lines=$(wc -l < "$LOG_FILE")
     if (( lines > MAX_LOG_LINES )); then
         mv "$LOG_FILE" "$LOG_ROTATED"
         touch "$LOG_FILE"
         echo "ℹ Rotated log (${lines} lines → ${LOG_ROTATED})" >&2
     fi
 }
+
 log_json() {
     printf '{"timestamp":"%s","action":"%s","category":"%s"}\n' \
         "$(get_timestamp)" "$1" "$2" >> "$LOG_FILE";
     rotate_logs
 }
-require_cmd() { command -v "$1" >/dev/null 2>&1 || die "Command '$1' not found."; }
-set_tmux() { 
+
+require_cmd() {
+    command -v "$1" >/dev/null 2>&1 || die "Command '$1' not found.";
+}
+
+set_tmux() { # [[ -n "${TMUX:-}" ]] ### || : similar to || true
     [[ -v TMUX ]] && tmux set -g status-right "$1" 2>/dev/null || :
-} # [[ -n "${TMUX:-}" ]] ### || : similar to || true
+}
 
 # === Setup ===
+
 require_cmd fzf
 require_cmd timew
 [[ -v TMUX ]] && require_cmd tmux
@@ -42,18 +62,28 @@ mkdir -p "$(dirname "$LOG_FILE")" && touch "$LOG_FILE"
 
 # === Select category ===
 selected="${1:-}" # allow CLI argument
-if [[ -z "$selected" ]]; then
-    set +e  #   temporarily disable exit-on-error for fzf (which can be cancelled)
-    selected=$(printf "%s\n" "${CATEGORIES[@]}" | fzf --prompt="Select category: " --height=40% --border --ansi --reverse) || exit 0
-    set -e  #   re-enable exit-on-error
-fi
+
+if [[ -z "$selected" ]]; then # temporarily disable exit-on-error for fzf (which can be cancelled)
+    set +e
+    selected=$(printf "%s\n" "${CATEGORIES[@]}" | fzf \
+        --prompt="Select category: " \
+        --height=40% \
+        --border \
+        --ansi \
+        --reverse \
+    ) || exit 0
+    set -e
+fi # re-enable exit-on-error
+
 [[ -z "$selected" ]] && exit 0
 [[ ! " ${CATEGORIES[*]} " =~ " $selected " ]] && die "Invalid category: $selected"
 
 # === Stop previous timer ===
+
 timew stop &>/dev/null || echo "⚠ No active timer to stop."
 
 # === Handle STOP mode ===
+
 if [[ "$selected" == "STOP" ]]; then
     set_tmux ""
     log_json STOP "$selected"
@@ -62,8 +92,10 @@ if [[ "$selected" == "STOP" ]]; then
 fi
 
 # === Start new timer ===
+
 timew start "$selected" >/dev/null 2>&1 || die "Failed to start timer for $selected"
 set_tmux "#[fg=${COLORS[$selected]:-default},bold]$selected#[default]"
+
 log_json START "$selected"
 echo "⏱ Tracking: $selected"
 
