@@ -4,17 +4,21 @@
 #   "pandas",
 #   "polars",
 #   "rich",
+#
 #   "icecream",
+#   "wat",
 # ]
 # ///
 
 import argparse  # /home/user/.local/share/nvim-kickstart/mason/packages/basedpyright/venv/lib/python3.10/site-packages/basedpyright/dist/typeshed-fallback/stdlib/argparse.pyi
+import os
 import sys  # /home/user/.local/share/nvim-kickstart/mason/packages/basedpyright/venv/lib/python3.10/site-packages/basedpyright/dist/typeshed-fallback/stdlib/sys/__init__.pyi
+import textwrap
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import BinaryIO, Self
+from typing import BinaryIO, Generator, Self
 
 import pandas as pd
 import polars as pl
@@ -22,101 +26,82 @@ from icecream import ic
 from rich import print as rprint
 from rich.console import Console
 from rich.table import Table
+from wat import wat
 
 
-# Streaming	Line-by-line reading, safe for large files
-def parse_history_gen(f: BinaryIO):
-    """
-    Generator that yields shell commands from zsh history.
+# Streaming: Line-by-line reading, safe for large files
+def parse_history_gen(f: BinaryIO) -> Generator[None, None, str]:
+    """Generator that yields shell commands from zsh history.
 
     Removes zsh extended history timestamps, e.g.:
         b': 1739424127:0;zoxide init' -> 'zoxide init'
+
     """
     for line in f:  # note that empty lines have no semicolon
         _, _, part = line.partition(b";")  # if not part: continue
         if cmd := part.strip(b"'\r\n"):  # skip empty or malformed lines
-            # NOTE: Could also use errors="replace" in decode() to avoid
-            #       skipping these `try/except` lines entirely
-            try:
+            try:  # can also use errors="replace" in decode() to avoid skipping these `try/except` lines entirely
                 yield cmd.decode("utf-8")  # ..., errors="replace"
             except UnicodeDecodeError:
                 continue  # skip unreadable lines
 
 
-@dataclass(slots=True)
-class Command:
-    """Represents one zsh extended history entry."""
-
-    timestamp: datatime
-    duration: int | None
-    exit_code: int | None
-    cmd: str | None = None
-    args: str | None
-    raw: str
-
-    @classmethod
-    def from_line(cls, line: bytes) -> Self | None:
-        if not line.startswith(b": "):
-            return None  # skip malformed or plain history lines
-
-        _, rest = line.split(b": ", 1)
-        header, cmd_part = rest.split(b";", 1)
-        header_fields = header.split(b":")
-        cmd_bytes = cmd_part.strip(b"'\r\n")
-
-        ts = datetime.fromtimestamp(int(header_fields[0]))
-        duration = (int(header_fields[1]) if len(header_fields) > 1 and header_fields[1].isdigit() else None)  # fmt: skip
-        exit_code = (int(header_fields[2]) if len(header_fields) > 2 and header_fields[2].isdigit() else None)  # fmt: skip
-
-        raw = cmd_bytes.decode("utf-8", errors="replace")
-        if not raw:
-            return None
-        parts = raw.split(maxsplit=1)
-        cmd = parts[0]
-        args = parts[1] if len(parts) > 1 else None
-
-        return cls(
-            timestamp=ts,
-            duration=duration,
-            exit_code=exit_code,
-            cmd=cmd,
-            args=args,
-            raw=raw,
-        )
-
-
 def run_plugin_dataframe() -> None:
-    """
-    csv_files = glob.glob("dataframes/2023*.csv")
-    dfs = [pd.read_csv(f) for f in csv_files]
-    orders = pd.concat(dfs, axis=0, ignore_index=True)
-    products = pd.read_csv("dataframes/products.csv")
-    df = orders.merge(products, on="product_id", how="left")
-    top = (df.groupby("product_name", as_index=False)["total"]
-        .sum() .sort_values("total", ascending=False) .head(10))
-    top.to_json("bestsellers_pandas.json", orient="records")
-    """
     match 1:
         case 1:
             _run_plugin_dataframe_polars_sql()
-        case 2:
+        case _:
             _run_plugin_dataframe_pandas()
 
 
 def _run_plugin_dataframe_polars_sql() -> None:
     limit = 20
+
+    console = Console()
+
     home = Path.home()
     scripts_dir = home / ".local" / "scripts"
     history_path = home / ".zsh_history"
-    scripts: set[str] = {p.stem for p in scripts_dir.iterdir() if p.is_file()}
-    ic(scripts)
-    # Ref: https://kestra.io/blogs/2023-08-11-dataframes#polars
+
+    scripts: set[str] = {
+        p.stem for p in scripts_dir.iterdir() if p.is_file() and os.access(p, os.X_OK)
+    }
+
+    if not history_path.exists():
+        console.print("Error: ~/.zsh_history not found")
+        return
+
+    # ref: https://kestra.io/blogs/2023-08-11-dataframes#polars
     with history_path.open("rb") as f:
-        ctx = pl.SQLContext(
-            commands=pl.concat(list(parse_history_gen(f))),
-            eager_execution=False,
+        commands = parse_history_gen(f)
+        df = pl.LazyFrame({"raw": commands}).with_columns(
+            pl.col("raw").str.split(" ").list.first().alias("cmd")
         )
-        ic(ctx)
+
+    ctx = pl.SQLContext()
+    ctx.register("history", df)
+
+    escaped: Generator[None, None, str] = (s.replace("'", "''") for s in scripts)
+    scripts_tuple: str = "(" + ", ".join(f"'{s}'" for s in escaped) + ")"
+    sql = textwrap.dedent(f"""
+        SELECT  cmd AS script,  COUNT(*) AS count
+        FROM    history
+        WHERE   cmd IN {scripts_tuple}
+        GROUP   BY cmd
+        ORDER   BY count DESC
+        LIMIT   {limit}
+    """)
+
+    try:
+        res = ctx.execute(sql).collect()
+    except Exception as e:
+        console.print(f"Error: SQL execution failed: {e}")
+        return
+    else:  # on no error
+        if res.is_empty():
+            console.print(f"Error: No matching scripts found in zsh history.")
+            return
+        console.print(res)
 
 
 def _run_plugin_dataframe_pandas() -> None:
@@ -144,11 +129,8 @@ def run_plugin_counter() -> None:
     scripts: set[str] = {p.stem for p in scripts_dir.iterdir() if p.is_file()}
     with history_path.open("rb") as f:
         commands = parse_history_gen(f)  # lazy generator
-        commands = (
-            Path(part).stem
-            for c in commands
-            if (parts := c.split(maxsplit=1)) and (part := parts[0])
-        )
+        commands = (Path(part).stem for c in commands if (parts := c.split(maxsplit=1))
+                    and (part := parts[0]))  # fmt: skip
         counts = Counter(name for name in commands if name in scripts)
     table = Table(title="Script Usage Stats", show_lines=False)
     table.add_column("Rank", justify="right", style="cyan")
@@ -157,31 +139,34 @@ def run_plugin_counter() -> None:
     for rank, (script, count) in enumerate(counts.most_common(limit), start=1):
         table.add_row(str(rank), script, str(count))
     console = Console()
-    Console().print(table)
+    console.print(table)
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Analyze local script usage from zsh history."
-    )
-    parser.add_argument(
-        "--mode",
-        choices=["dataframe", "counter"],
-        default="dataframe",
-        help="Choose implementation mode: pandas dataframe or Counter",
-    )
-    parser.add_argument(
-        "--limit",
-        type=int,
-        default=20,
-        help="Number of top scripts to display",
-    )
-    args = parser.parse_args()
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(description="Analyze local script usage from zsh history.")  # fmt: skip
+    p.add_argument("--mode", choices=["dataframe", "counter"], default="dataframe",
+                   help="Choose implementation mode: pandas dataframe or Counter")  # fmt: skip
+    p.add_argument("--limit", type=int, default=20,
+                   help="Number of top scripts to display")  # fmt: skip
+    p.add_argument("--debug", action="store_true",
+                   help="Enable lightweight debug output (requires icecream)",)  # fmt: skip
+    return p
+
+
+def run(args: argparse.Namespace) -> int:
     match args.mode:
         case "counter":
             run_plugin_counter()
-        case _:  # default catch all case
+        case _:  # catch all
             run_plugin_dataframe()
+    return 0
+
+
+def main():
+    parser = build_parser()
+    args = parser.parse_args()
+    code = run(args)
+    raise SystemExit(code)
 
 
 if __name__ == "__main__":
@@ -258,5 +243,4 @@ zsh-histdb:
   ORDER BY count DESC
   LIMIT 20;
   ```
-
 """
