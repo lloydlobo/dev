@@ -1,3 +1,4 @@
+#!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.14"
 # dependencies = [
@@ -32,18 +33,16 @@ from wat import wat
 # Streaming: Line-by-line reading, safe for large files
 def parse_history_gen(f: BinaryIO) -> Generator[None, None, str]:
     """Generator that yields shell commands from zsh history.
-
     Removes zsh extended history timestamps, e.g.:
         b': 1739424127:0;zoxide init' -> 'zoxide init'
-
     """
     for line in f:  # note that empty lines have no semicolon
         _, _, part = line.partition(b";")  # if not part: continue
         if cmd := part.strip(b"'\r\n"):  # skip empty or malformed lines
-            try:  # can also use errors="replace" in decode() to avoid skipping these `try/except` lines entirely
+            try:
                 yield cmd.decode("utf-8")  # ..., errors="replace"
-            except UnicodeDecodeError:
-                continue  # skip unreadable lines
+            except UnicodeDecodeError:  # skip unreadable lines
+                continue
 
 
 def run_plugin_dataframe() -> None:
@@ -66,6 +65,7 @@ def _run_plugin_dataframe_polars_sql() -> None:
     scripts: set[str] = {
         p.stem for p in scripts_dir.iterdir() if p.is_file() and os.access(p, os.X_OK)
     }
+    ic(scripts)
 
     if not history_path.exists():
         console.print("Error: ~/.zsh_history not found")
@@ -174,12 +174,15 @@ if __name__ == "__main__":
 
 """
 Usage:
-  uv run --script scripts_stats.py --mode=counter
-  uv run --script scripts_stats.py --mode=dataframe
+  uv run --script stats.py --mode=counter
+  uv run --script stats.py --mode=dataframe
+
+  chmod +x stats.py
+  ./stats.py --mode=dataframe
 
 Formatting:
-  uvx ruff format scripts_stats.py
-  uvx isort scripts_stats.py
+  uvx ruff format stats.py
+  uvx isort stats.py
 """
 
 """
@@ -244,3 +247,6 @@ zsh-histdb:
   LIMIT 20;
   ```
 """
+
+# vim:filetype=python:
+# vim:tw=78:ts=4:sw=4:et:ft=help:norl:
