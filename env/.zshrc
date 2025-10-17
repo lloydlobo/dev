@@ -1,4 +1,8 @@
-# ~/.zshrc - Zsh configuration file
+# file: ~/.zshrc - Zsh configuration file
+#
+# $ DEV_ENV=~/Personal/dev ./dev-env.sh
+# $ DEV_ENV=~/Personal/dev ./dev-env.sh --dry
+# $ exec zsh # to source ~/.zshrc immediately
 
 # - - - - - - - - - - - - - - - - - - - -
 # Profiling Tools
@@ -38,6 +42,16 @@ fi
 # Async autosuggestions
 typeset -g ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE="20"
 typeset -g ZSH_AUTOSUGGEST_USE_ASYNC=1
+
+# - - - - - - - - - - - - - - - - - - - -
+# Prompt at bottom
+# - - - - - - - - - - - - - - - - - - - -
+
+# Put these line in your zshrc, before load instant prompt.
+# - Ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-599010321
+# - Ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-656503092
+printf '\n%.0s' {1..$LINES} # move prompt to the bottom
+printf '\033[5 q\r' # change cursor to I-beam
 
 # - - - - - - - - - - - - - - - - - - - -
 # Instant Prompt (Powerlevel10k)

@@ -2,9 +2,10 @@
 #
 # $ DEV_ENV=~/Personal/dev ./dev-env.sh
 # $ DEV_ENV=~/Personal/dev ./dev-env.sh --dry
+# $ exec zsh # to source ~/.zshrc immediately
 #
 # Sources:
-#	- https://github.com/ThePrimeagen/dev/blob/master/env/.zsh_profile
+#   - https://github.com/ThePrimeagen/dev/blob/master/env/.zsh_profile
 
 export XDG_CONFIG_HOME=$HOME/.config
 export GTK_THEME=Adwaita:dark nautilus
@@ -42,6 +43,11 @@ eval "$(mise activate zsh)"
 # =============================================================================
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
+
+# =============================================================================
+# Homebrew
+# =============================================================================
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # =============================================================================
 # FZF
@@ -82,15 +88,33 @@ bindkey -s ^x 'fzfclip\n'  # ref: https://github.com/yobibyte/yobitools/blob/mai
 . "$HOME/.cargo/env"
 
 # =============================================================================
+# Helpers
+
+# --- Custom Ctrl-L behavior ---
+bottom_clear_screen() { # ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-1742316976
+    local lines
+    lines=$(tput lines) || lines=$LINES  # get current terminal height
+    tput -x clear                        # clear screen properly (retains scrollback history)
+    printf '\n%.0s' {1..$lines}          # print enough newlines to reach bottom
+} # WARNING: bottom_clear_screen:zle:5: widgets can only be called when ZLE is active
+bottom_clear_screen_reset_prompt() { # ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-1742316976
+    bottom_clear_screen
+    zle reset-prompt                     # redraw prompt correctly
+}
+zle -N bottom_clear_screen_reset_prompt
+bindkey '^L' bottom_clear_screen_reset_prompt # Ref: https://unix.stackexchange.com/a/674837 ( Ctrl+l is a keybinding to readline's clear-screen command (man 3 readline).)
+
+# =============================================================================
 # Aliases
-alias c="clear"
+alias c='bottom_clear_screen'
+alias clear='bottom_clear_screen'
 alias fd="rg --files"  # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
 alias gs="git status --short --branch"
 alias lg="lazygit"
 alias ls="ls --color"
+alias vim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'
 alias vim="nvim"
 alias vimog="vim.tiny"
-alias vim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'
 # | Example:      | `alias nvim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'` |
 # | Config Path:  | `~/.config/nvim-kickstart`                                  |
 # | Data Path:    | `~/.local/share/nvim-kickstart`                             |
@@ -137,3 +161,4 @@ addToPathFront $HOME/.local/scripts/
 # addToPathFront $HOME/Personal/sumneko/bin/
 addToPath $HOME/.cargo/bin/
 addToPathFront /usr/local/go/bin/
+
