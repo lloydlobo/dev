@@ -93,7 +93,9 @@ fi
 
 # === Start new timer ===
 
-timew start "$selected" >/dev/null 2>&1 || die "Failed to start timer for $selected"
+# timew start "$selected" >/dev/null 2>&1 || die "Failed to start timer for $selected"
+timew start "$selected" || die "Failed to start timer for $selected"
+
 set_tmux "#[fg=${COLORS[$selected]:-default},bold]$selected#[default]"
 
 log_json START "$selected"
