@@ -46,16 +46,62 @@ fi
 #=================================================
 # Package Managers
 #=================================================
+
+### homebrew ###
+
+# homebrew prerequisites: build-essential gcc
+#
+# It's self contained in /home/linuxbrew/.linuxbrew and can easily be blown away - doesn't interfere with the system (see https://www.ypsidanger.com/homebrew-is-great-on-linux/)
+# ==> Caveats
+# zsh completions have been installed to:
+#   /home/linuxbrew/.linuxbrew/share/zsh/site-functions
+#
+# The default installation of Homebrew puts it in your system path. This can lead to some unfortunate issues, if you brew install ffmpeg this will pull in p11-kit, and adds it to the path. And then Flatpaks stopped working because that library was preferred over the system one. Here's how [we workaround that](https://github.com/ublue-os/config/blob/main/build/ublue-os-just/etc-profile.d/brew.sh?ref=ypsidanger.com) by setting the path only in interactive terminals.
+#   #!/usr/bin/env bash
+#   [[ -d /home/linuxbrew/.linuxbrew && $- == *i* ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+#
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+### uv ###
+
 curl -LsSf https://astral.sh/uv/install.sh | sh
-if false; then
+if false; then # first time!?
 	echo 'eval "$(uv generate-shell-completion bash)"' >>~/.bashrc
 	echo 'eval "$(uv generate-shell-completion zsh)"' >>~/.zshrc
 	echo 'eval "$(uvx --generate-shell-completion bash)"' >>~/.bashrc
 	echo 'eval "$(uvx --generate-shell-completion zsh)"' >>~/.zshrc
 fi
-if false; then
-	uv self update
-fi
+if false; then uv self update; fi
+
+
+#/////////////////////////////////////////////////
+# CONVENIENCE
+#/////////////////////////////////////////////////
+sudo apt -y install entr lnav plocate redshift rsibreak yt-dlp # redshift -PO 3600
+sudo apt -y install direnv timewarrior
+
+sudo apt -y install expect  # https://core.tcl.tk/expect/        Provides: unbuffer
+sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iostat
+
+#                             sudo apt -y install ffmpeg 7zip jq poppler-utils fd-find ripgrep fzf zoxide imagemagick
+
+brew install git-delta
+brew tap philocalyst/tap && brew install caligula
+
+go install github.com/air-verse/air@latest
+go install github.com/charmbracelet/glow@latest
+go install github.com/charmbracelet/vhs@latest
+go install github.com/cheat/cheat/cmd/cheat@latest
+
+cargo install --jobs=4 bat gping navi tealdeer tokei yazi-cli zoxide
+cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
+cargo install --jobs=4 --locked serpl
+
+uv tool list           # starting... (installs in  /home/user/.local/bin/)
+uv tool install httpie # Installed 3 executables: http, httpie, https  #  $ unbuffer http https://example.com | sponge | bat
+uv tool install marimo
+uv tool install pre-commit
+uv tool list # ...finished
 
 #=================================================
 # UI/UX
@@ -72,31 +118,6 @@ sudo apt -y install xcowsay acpitool
 sudo apt -y install x264 mpv ffmpeg
 sudo apt -y install evince
 
-#/////////////////////////////////////////////////
-# CONVENIENCE
-#/////////////////////////////////////////////////
-sudo apt -y install entr lnav plocate redshift rsibreak yt-dlp # redshift -PO 3600
-sudo apt -y install direnv timewarrior
-
-sudo apt -y install expect  # https://core.tcl.tk/expect/        Provides: unbuffer
-sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iostat
-
-#                             sudo apt -y install ffmpeg 7zip jq poppler-utils fd-find ripgrep fzf zoxide imagemagick
-
-go install github.com/air-verse/air@latest
-go install github.com/charmbracelet/glow@latest
-go install github.com/charmbracelet/vhs@latest
-go install github.com/cheat/cheat/cmd/cheat@latest
-
-cargo install --jobs=4 bat gping navi tealdeer tokei yazi-cli zoxide
-cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
-cargo install --jobs=4 --locked serpl
-
-uv tool list           # starting... (installs in  /home/user/.local/bin/)
-uv tool install httpie # Installed 3 executables: http, httpie, https  #  $ unbuffer http https://example.com | sponge | bat
-uv tool install marimo
-uv tool install pre-commit
-uv tool list # ...finished
 
 #/////////////////////////////////////////////////
 # Dynamic code analysis
