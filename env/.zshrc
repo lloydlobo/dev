@@ -51,7 +51,7 @@ typeset -g ZSH_AUTOSUGGEST_USE_ASYNC=1
 # - Ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-599010321
 # - Ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-656503092
 printf '\n%.0s' {1..$LINES} # move prompt to the bottom
-printf '\033[5 q\r' # change cursor to I-beam
+# printf '\033[5 q\r' # change cursor to I-beam
 
 # - - - - - - - - - - - - - - - - - - - -
 # Instant Prompt (Powerlevel10k)

@@ -7,6 +7,9 @@
 # Sources:
 #   - https://github.com/ThePrimeagen/dev/blob/master/env/.zsh_profile
 
+# $ rg TODO
+# $ rg FIXME | fzf
+
 export XDG_CONFIG_HOME=$HOME/.config
 export GTK_THEME=Adwaita:dark nautilus
 # See https://forum.manjaro.org/t/nautilus-does-not-switch-to-dark-mode/132095/2
@@ -58,6 +61,8 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 export DEV_ENV_HOME="$HOME/Personal/dev"
 export GIT_EDITOR=$VIM
 
+# $ echo $PATH | tr ':' '\n'
+
 #export GOPATH=$HOME/.local/go # (unimplemented)
 export GOROOT=/usr/local/go
 export PATH=$GOROOT/bin:$PATH
@@ -66,6 +71,7 @@ export PATH=$HOME/go/bin:$PATH
 export DOTNET_CLI_TELEMETRY_OPTOUT=true # opt-out of telemetry (.NET tools collects usage data)
 export DOTNET_ROOT="$HOME/.dotnet" # .NET SDK (installed via dotnet-install.sh)
 export PATH=$DOTNET_ROOT:$PATH
+export PATH=$DOTNET_ROOT/tools:$PATH
 
 # For Zed binary installed via `curl -f https://zed.dev/install.sh | sh`
 export PATH=$HOME/.local/bin:$PATH
@@ -110,15 +116,16 @@ alias c='bottom_clear_screen'
 alias clear='bottom_clear_screen'
 alias fd="rg --files"  # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
 alias gs="git status --short --branch"
+alias httpserver="python3 -m http.server 8000"
 alias lg="lazygit"
-alias ls="ls --color"
+alias ls="ls --color" # FIXME: Only run this when in interactive shell (avoid ansi escape sequence from all the coloring)
+alias l="eza -lT"
 alias vim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'
 alias vim="nvim"
 alias vimog="vim.tiny"
 # | Example:      | `alias nvim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'` |
 # | Config Path:  | `~/.config/nvim-kickstart`                                  |
 # | Data Path:    | `~/.local/share/nvim-kickstart`                             |
-alias tr="python3 -m http.server 8000"
 alias wtr="curl -Ss wttr.in | head -n -1"
 
 # =============================================================================

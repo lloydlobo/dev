@@ -47,7 +47,7 @@ fi
 # Package Managers
 #=================================================
 
-### homebrew ###
+# === homebrew ===
 
 # homebrew prerequisites: build-essential gcc
 #
@@ -62,7 +62,7 @@ fi
 #
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-### uv ###
+# === uv ===
 
 curl -LsSf https://astral.sh/uv/install.sh | sh
 if false; then # first time!?
@@ -72,7 +72,6 @@ if false; then # first time!?
 	echo 'eval "$(uvx --generate-shell-completion zsh)"' >>~/.zshrc
 fi
 if false; then uv self update; fi
-
 
 #/////////////////////////////////////////////////
 # CONVENIENCE
@@ -85,18 +84,22 @@ sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iosta
 
 #                             sudo apt -y install ffmpeg 7zip jq poppler-utils fd-find ripgrep fzf zoxide imagemagick
 
+# TODO: Ensure --confirm or -y to skip interactive prompts...
+brew install eza
 brew install git-delta
 brew tap philocalyst/tap && brew install caligula
+brew install llama.cpp
 
 go install github.com/air-verse/air@latest
 go install github.com/charmbracelet/glow@latest
 go install github.com/charmbracelet/vhs@latest
 go install github.com/cheat/cheat/cmd/cheat@latest
 
-cargo install --jobs=4 bat gping navi tealdeer tokei yazi-cli zoxide
+cargo install --jobs=4 bat gping impala navi tealdeer tokei yazi-cli zoxide
 cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
 cargo install --jobs=4 --locked serpl
 
+# TODO: Ensure --confirm or -y to skip interactive prompts...
 uv tool list           # starting... (installs in  /home/user/.local/bin/)
 uv tool install httpie # Installed 3 executables: http, httpie, https  #  $ unbuffer http https://example.com | sponge | bat
 uv tool install marimo
@@ -108,6 +111,7 @@ uv tool list # ...finished
 #=================================================
 sudo apt -y install feh
 sudo apt -y install xcowsay acpitool
+sudo apt -y install pinta # pinta - for drawing and image editing
 
 # Compiling ImHex on Linux
 # See: https://github.com/WerWolv/ImHex/blob/master/dist/compiling/linux.md
@@ -164,5 +168,15 @@ wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.g
 echo 'deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg] https://download.vscodium.com/debs vscodium main' |
 	sudo tee /etc/apt/sources.list.d/vscodium.list
 sudo apt update && sudo apt install codium
+
+#/////////////////////////////////////////////////
+# Dotnet extras
+#/////////////////////////////////////////////////
+
+dotnet tool install -g fantomas
+#   cat << \EOF >> ~/.bash_profile
+#   # Add .NET Core SDK tools
+#   export PATH="$PATH:/home/user/.dotnet/tools"
+#   EOF
 
 # vim: filetype=bash
