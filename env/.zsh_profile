@@ -96,30 +96,35 @@ bindkey -s ^x 'fzfclip\n'  # ref: https://github.com/yobibyte/yobitools/blob/mai
 # =============================================================================
 # Helpers
 
-# --- Custom Ctrl-L behavior ---
-bottom_clear_screen() { # ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-1742316976
-    local lines
-    lines=$(tput lines) || lines=$LINES  # get current terminal height
-    tput -x clear                        # clear screen properly (retains scrollback history)
-    printf '\n%.0s' {1..$lines}          # print enough newlines to reach bottom
-} # WARNING: bottom_clear_screen:zle:5: widgets can only be called when ZLE is active
-bottom_clear_screen_reset_prompt() { # ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-1742316976
-    bottom_clear_screen
-    zle reset-prompt                     # redraw prompt correctly
-}
-zle -N bottom_clear_screen_reset_prompt
-bindkey '^L' bottom_clear_screen_reset_prompt # Ref: https://unix.stackexchange.com/a/674837 ( Ctrl+l is a keybinding to readline's clear-screen command (man 3 readline).)
+if false; then
+    # - - - - - - - - - - - - - - - - - - - -
+    # Custom Ctrl-L behavior
+    # - - - - - - - - - - - - - - - - - - - -
+    bottom_clear_screen() { # ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-1742316976
+        local lines
+        lines=$(tput lines) || lines=$LINES  # get current terminal height
+        tput -x clear                        # clear screen properly (retains scrollback history)
+        printf '\n%.0s' {1..$lines}          # print enough newlines to reach bottom
+    } # WARNING: bottom_clear_screen:zle:5: widgets can only be called when ZLE is active
+    bottom_clear_screen_reset_prompt() { # ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-1742316976
+        bottom_clear_screen
+        zle reset-prompt                     # redraw prompt correctly
+    }
+    zle -N bottom_clear_screen_reset_prompt
+    bindkey '^L' bottom_clear_screen_reset_prompt # Ref: https://unix.stackexchange.com/a/674837 ( Ctrl+l is a keybinding to readline's clear-screen command (man 3 readline).)
+    alias c='bottom_clear_screen'
+    alias clear='bottom_clear_screen'
+fi
 
 # =============================================================================
 # Aliases
-alias c='bottom_clear_screen'
-alias clear='bottom_clear_screen'
+alias c="tput -x clear"
 alias fd="rg --files"  # ref: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
 alias gs="git status --short --branch"
 alias httpserver="python3 -m http.server 8000"
 alias lg="lazygit"
 alias ls="ls --color" # FIXME: Only run this when in interactive shell (avoid ansi escape sequence from all the coloring)
-alias l="eza -lT"
+alias l="eza -lT" # $ l | sponge | column
 alias vim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'
 alias vim="nvim"
 alias vimog="vim.tiny"

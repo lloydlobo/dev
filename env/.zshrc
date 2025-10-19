@@ -13,10 +13,10 @@
 #   Ref: https://scottspence.com/posts/speeding-up-my-zsh-shell#how-to-profile-your-zsh
 #   Ref: https://blog.askesis.pl/post/2017/04/how-to-debug-zsh-startup-time.html
 #   Ref: https://github.com/zdharma-continuum/zinit-configs/blob/master/brucebentley/zshrc
-ENABLE_ZPROF_STARTUP=false
+ENABLE_ZPROF_STARTUP=true
 
 if [[ "$ENABLE_ZPROF_STARTUP" == true ]]; then
-    zmodload zsh/zprof 
+    zmodload zsh/zprof
     PS4=$'%D{%M%S%.} %N:%i> ' # ref: http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html
     exec 3>&2 2>$HOME/startlog.$$
     setopt xtrace prompt_subst
@@ -43,15 +43,16 @@ fi
 typeset -g ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE="20"
 typeset -g ZSH_AUTOSUGGEST_USE_ASYNC=1
 
-# - - - - - - - - - - - - - - - - - - - -
-# Prompt at bottom
-# - - - - - - - - - - - - - - - - - - - -
-
-# Put these line in your zshrc, before load instant prompt.
-# - Ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-599010321
-# - Ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-656503092
-printf '\n%.0s' {1..$LINES} # move prompt to the bottom
-# printf '\033[5 q\r' # change cursor to I-beam
+if false; then
+    # - - - - - - - - - - - - - - - - - - - -
+    # Prompt at bottom
+    # - - - - - - - - - - - - - - - - - - - -
+    printf '\n%.0s' {1..$LINES} # move prompt to the bottom
+    # printf '\033[5 q\r' # change cursor to I-beam
+    # Put these line in your zshrc, before load instant prompt.
+    # - Ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-599010321
+    # - Ref: https://github.com/romkatv/powerlevel10k/issues/563#issuecomment-656503092
+fi
 
 # - - - - - - - - - - - - - - - - - - - -
 # Instant Prompt (Powerlevel10k)
@@ -176,7 +177,7 @@ fi
 [[ -f $HOME/.zsh_profile ]] && source $HOME/.zsh_profile # NOTE: to make exports available everywhere, move them to .zshenv instead, and remove the source here
 
 # Powerlevel10k configuration: to customize prompt, run `p10k configure` or edit ~/.p10k.zsh
-[[ ! -f ~/.p10k.zsh ]] || source $HOME/.p10k.zsh 
+[[ ! -f ~/.p10k.zsh ]] || source $HOME/.p10k.zsh
 
 # - - - - - - - - - - - - - - - - - - - -
 # Tool shell integration (NOTE: Few `eval`s are in .zsh_profile)
@@ -195,7 +196,7 @@ fi
 
 # Yazi File Manager - change directory on exit
 if (( $+commands[yazi] )); then
-    y() { 
+    y() {
         local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
         yazi "$@" --cwd-file="$tmp"
         if local cwd="$(command cat -- "$tmp")" && [[ -n "$cwd" ]] && [[ "$cwd" != "$PWD" ]]; then
@@ -217,7 +218,6 @@ if [[ "$ENABLE_ZPROF_STARTUP" == true ]]; then
     exec 2>&3 3>&-
     zprof > ~/zshprofile$(date +'%s') 
 fi # ref: https://github.com/zdharma-continuum/zinit-configs/blob/master/brucebentley/zshrc
-
 
 # Dotfiles:
 #   - https://github.com/dreamsofautonomy/zensh/blob/main/.zshrc
