@@ -11,6 +11,8 @@
 # ]
 # ///
 
+# FIXME: The script or something else - strips ~/.zsh_history timestamp prefixes
+
 import argparse  # /home/user/.local/share/nvim-kickstart/mason/packages/basedpyright/venv/lib/python3.10/site-packages/basedpyright/dist/typeshed-fallback/stdlib/argparse.pyi
 import os
 import sys  # /home/user/.local/share/nvim-kickstart/mason/packages/basedpyright/venv/lib/python3.10/site-packages/basedpyright/dist/typeshed-fallback/stdlib/sys/__init__.pyi
@@ -65,7 +67,6 @@ def _run_plugin_dataframe_polars_sql() -> None:
     scripts: set[str] = {
         p.stem for p in scripts_dir.iterdir() if p.is_file() and os.access(p, os.X_OK)
     }
-    ic(scripts)
 
     if not history_path.exists():
         console.print("Error: ~/.zsh_history not found")
