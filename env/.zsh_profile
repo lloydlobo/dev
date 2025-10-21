@@ -53,6 +53,11 @@ eval "$(uvx --generate-shell-completion zsh)"
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # =============================================================================
+# direnv (See https://direnv.net/docs/hook.html)
+# =============================================================================
+eval "$(direnv hook zsh)"
+
+# =============================================================================
 # FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
