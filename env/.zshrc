@@ -159,6 +159,10 @@ zstyle ':completion:*' squeeze-slashes true
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
+# Other fzf goodies:
+# - Alt+z (...and then j/k) (prev history quick toggle)
+# - Alt+c (interactively jump to filtered directory)
+
 # - - - - - - - - - - - - - - - - - - - -
 # Environment Variables
 # - - - - - - - - - - - - - - - - - - - -
