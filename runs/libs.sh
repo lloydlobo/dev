@@ -89,6 +89,9 @@ brew install eza
 brew install git-delta
 brew tap philocalyst/tap && brew install caligula
 brew install llama.cpp
+brew install grex
+brew install cbonsai
+brew install croc
 
 go install github.com/air-verse/air@latest
 go install github.com/charmbracelet/glow@latest
