@@ -92,6 +92,7 @@ brew install llama.cpp
 brew install grex
 brew install cbonsai
 brew install croc
+brew install w3m
 
 go install github.com/air-verse/air@latest
 go install github.com/charmbracelet/glow@latest

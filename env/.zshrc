@@ -13,7 +13,7 @@
 #   Ref: https://scottspence.com/posts/speeding-up-my-zsh-shell#how-to-profile-your-zsh
 #   Ref: https://blog.askesis.pl/post/2017/04/how-to-debug-zsh-startup-time.html
 #   Ref: https://github.com/zdharma-continuum/zinit-configs/blob/master/brucebentley/zshrc
-ENABLE_ZPROF_STARTUP=true
+ENABLE_ZPROF_STARTUP=false
 
 if [[ "$ENABLE_ZPROF_STARTUP" == true ]]; then
     zmodload zsh/zprof
