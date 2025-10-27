@@ -124,6 +124,7 @@ fi
 # =============================================================================
 # Aliases
 
+archive() { mv --interactive --verbose $1 $HOME/archive/2025 } # source: https://github.com/yobibyte/yobitools/blob/main/dotfiles/.zshrc
 alias b='w3m $(xsel -b -o)' # 'w3m $(xsel -b -o)' # copied from yobibyte
 alias c='tput -x clear'
 alias d='w3m duckduckgo.com' # 'w3m $(xsel -b -o)' # copied from yobibyte
