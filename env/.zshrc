@@ -131,7 +131,7 @@ bindkey '^[w' kill-region             # Alt+W
 # History Configuration
 # - - - - - - - - - - - - - - - - - - - -
 
-HISTSIZE=10000
+HISTSIZE=100000
 HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history
 SAVEHIST=$HISTSIZE
 HISTDUP=erase
