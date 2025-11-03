@@ -93,6 +93,7 @@ brew install grex
 brew install cbonsai
 brew install croc
 brew install w3m
+brew install asciinema
 
 go install github.com/air-verse/air@latest
 go install github.com/charmbracelet/glow@latest
