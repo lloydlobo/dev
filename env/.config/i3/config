@@ -5,6 +5,7 @@
 
 # i3 config file (v4)
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
+# See also: https://gist.github.com/romanjoe/b44b30e002701ad0b0ac?utm_source=chatgpt.com
 
 # ==========================
 # KEY BINDINGS AND MODIFIERS
@@ -107,6 +108,9 @@ bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
+# # Disable borders for all windows
+# for_window [title="^.*"] border 1pixel
+
 # enable floating mode for all XTerm windows
 for_window [class="XTerm"] floating enable
 
@@ -118,7 +122,8 @@ for_window [class="urxvt"] border pixel 1
 for_window [title="x200: ~/work"] floating enable
 
 # No borders. Source: Childz
-for_window [class="^.*"] border pixel 2
+# for_window [class="^.*"] border pixel 2
+for_window [class="^.*"] border pixel 3
 
 # Please note that new_window and new_float have been deprecated in favor of
 # the above options and will be removed in a future release. We strongly
@@ -150,9 +155,8 @@ bindsym $mod+Shift+space floating toggle
 bindsym $mod+space focus mode_toggle
 # focus the parent container
 bindsym $mod+a focus parent
-
-# focus the child container
-#bindsym $mod+d focus child
+# focus the child container (bindsym $mod+d focus child)
+bindsym $mod+Alt+a focus parent
 
 # ==========================
 # WORKSPACES
@@ -180,6 +184,7 @@ workspace_auto_back_and_forth yes
 # Win+Ctrl + k --> move to left workspace
 # See https://github.com/HarshalRathore/my-i3-config/blob/81559e692a7c4176890ac9f07ae1f24904c76cb8/.config/i3/config#L687-L696
 bindsym $mod+z workspace back_and_forth
+bindsym $mod+Control+space workspace back_and_forth
 bindsym $mod+Control+j workspace prev
 bindsym $mod+Control+k workspace next
 bindsym $mod+Control+Left workspace prev
@@ -190,16 +195,17 @@ bindsym $mod+Control+Right workspace next
 
 # Bind programs to workspace and focus on them at startup
 # See https://github.com/HarshalRathore/my-i3-config/blob/main/.config/i3/config
-assign [class="wezterm"] $ws1
-assign [class="clion"] $ws1
 assign [class="Xfce4-terminal"] $ws1
+assign [class="clion"] $ws1
+assign [class="wezterm"] $ws1
 assign [class="(?i)brave-browser"] $ws2
-assign [class="(?i)vivaldi"] $ws2
 assign [class="(?i)firefox"] $ws2
+assign [class="(?i)vivaldi"] $ws2
+assign [class="(?i)zen"] $ws2
 assign [class="codium"] $ws3
-# assign [class="Org.gnome.Nautilus"] $ws4
-assign [class="nautilus"] $ws4
+assign [class="Org.gnome.Nautilus"] $ws4
 assign [class="jetbrains-toolbox"] $ws4
+assign [class="nautilus"] $ws4
 assign [class="TelegramDesktop"] $ws5
 assign [class="btop"] $ws0
 assign [class="lnav"] $ws0
@@ -402,11 +408,21 @@ set $focus_color #75b5aa
 # Darken the foreground for better visibility on the workspace numbers
 set $workspace_fg_color #c0bed1
 set $workspace_inactive_fg_color #333333
-#
+
+# Focused window: brighter border + lighter background + brighter text
+set $bg_focused #444444
+set $fg_focused #ffffff
+set $active_window_border #ffb86c
+
 # Window border colors
-client.focused          $bg_color $bg_dark_color $accent_color
+#
+# OG (perfection)
+# client.focused          $bg_color $bg_dark_color $accent_color
+# client.focused_inactive $bg_color $fg_color $fg_color
+#
+client.focused          $bg_color $bg_focused $accent_color
+client.focused_inactive $bg_dark_color $bg_color $fg_color
 client.unfocused        $inactive_window_border $bg_color $fg_color
-client.focused_inactive $bg_color $fg_color $fg_color
 client.urgent           $error_color $bg_color $fg_color
 
 # ==========================
