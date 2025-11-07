@@ -131,19 +131,32 @@ bindkey '^[w' kill-region             # Alt+W
 # History Configuration
 # - - - - - - - - - - - - - - - - - - - -
 
-HISTSIZE=100000
 HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history
+HISTSIZE=100000
 SAVEHIST=$HISTSIZE
 HISTDUP=erase
 
-setopt appendhistory # append rather than overwrite history
-setopt hist_find_no_dups  # don't show duplicates in search
-setopt hist_ignore_all_dups # delete old duplicates
-setopt hist_ignore_dups
-setopt hist_ignore_space # ignore commands starting with space
-setopt hist_reduce_blanks # remove superfluous blanks
-setopt hist_save_no_dups # don't save duplicates
-setopt sharehistory # share history across sessions
+setopt NO_NOMATCH               # don't error if glob doesn't match
+
+setopt AUTO_CD                  # type directory name to cd
+setopt CORRECT                  # correct small typos
+setopt NOTIFY                   # notify when background job finishes
+
+# Flow control is a mechanism that uses Ctrl-S (stop) and Ctrl-Q (start) to pause and resume terminal output.
+# By default, terminals may interpret Ctrl-S as “pause output” and Ctrl-Q as “resume output.”
+# If NO_FLOW_CONTROL is set, Zsh ignores Ctrl-S/Ctrl-Q, so you can use Ctrl-S for other things (like searching in some apps or plugins) without freezing the terminal.
+setopt NO_FLOW_CONTROL          # optional: prevents Ctrl-S (stop) freezing terminal (Ctrl-Q (start) pauses and resume)
+
+# History behavior
+# ...... ................       # setopt hist_ignore_dups
+setopt appendhistory            # append rather than overwrite history
+setopt hist_expire_dups_first
+setopt hist_find_no_dups        # don't show duplicates in search
+setopt hist_ignore_all_dups     # delete old duplicates
+setopt hist_ignore_space        # ignore commands starting with space
+setopt hist_reduce_blanks       # remove superfluous blanks
+setopt hist_save_no_dups        # don't save duplicates
+setopt sharehistory             # share history across sessions
 
 set -o vi # see also: zvm (vi mode plugin)
 
