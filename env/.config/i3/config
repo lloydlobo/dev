@@ -183,8 +183,8 @@ workspace_auto_back_and_forth yes
 # Win+Ctrl + j <-- move to right workspace
 # Win+Ctrl + k --> move to left workspace
 # See https://github.com/HarshalRathore/my-i3-config/blob/81559e692a7c4176890ac9f07ae1f24904c76cb8/.config/i3/config#L687-L696
-bindsym $mod+z workspace back_and_forth
-bindsym $mod+Control+space workspace back_and_forth
+# bindsym $mod+z workspace back_and_forth
+bindsym $alt+space workspace back_and_forth
 bindsym $mod+Control+j workspace prev
 bindsym $mod+Control+k workspace next
 bindsym $mod+Control+Left workspace prev
