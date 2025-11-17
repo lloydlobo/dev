@@ -44,15 +44,7 @@ sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iosta
 
 brew install asciinema
 brew tap philocalyst/tap && brew install caligula
-brew install cbonsai
-brew install croc
-brew install eza
-brew install git-delta
-brew install grex
-brew install llama.cpp
-brew install ncdu
-brew install syncthing
-brew install w3m
+brew install cbonsai croc eza git-delta grex llama.cpp ncdu syncthing w3m
 
 cargo install --jobs=4 bat gping impala navi tealdeer tokei yazi-cli zoxide
 cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
@@ -63,16 +55,12 @@ go install github.com/charmbracelet/glow@latest
 go install github.com/charmbracelet/vhs@latest
 go install github.com/cheat/cheat/cmd/cheat@latest
 
-uv tool install httpie      # Installed 3 executables: http, httpie, https  #  $ unbuffer http https://example.com | sponge | bat
-uv tool install marimo
-uv tool install pre-commit
+uv tool install htpie marimo pre-commit  # Installed 3 executables: http, httpie, https  #  $ unbuffer http https://example.com | sponge | bat
 
 #-------------------------------------------------
 # UI/UX
 #-------------------------------------------------
-sudo apt -y install feh
-sudo apt -y install xcowsay acpitool
-sudo apt -y install pinta # pinta - for drawing and image editing
+sudo apt -y install feh xcowsay acpitool pinta  # pinta - for drawing and image editing
 
 #-------------------------------------------------
 # Media
