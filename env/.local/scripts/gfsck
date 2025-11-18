@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+git fsck --lost-found | \
+fzf --ansi \
+    --multi \
+    --reverse \
+    --header "Select a lost/dangling object to preview (Ctrl-Y to copy SHA)" \
+    --preview-window 'right:60%' \
+    --bind 'ctrl-y:execute-silent(echo {} | cut -d " " -f 3 | tr -d "\n" | xclip -selection clipboard)' \
+    --preview 'SHA=$(echo {} | awk "{print \$3}"); [ -z "$SHA" ] || git show --color=always $SHA'
