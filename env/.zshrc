@@ -150,12 +150,12 @@ setopt NO_FLOW_CONTROL          # optional: prevents Ctrl-S (stop) freezing term
 # History behavior
 # ...... ................       # setopt hist_ignore_dups
 setopt appendhistory            # append rather than overwrite history
-setopt hist_expire_dups_first
+# setopt hist_expire_dups_first
 setopt hist_find_no_dups        # don't show duplicates in search
-setopt hist_ignore_all_dups     # delete old duplicates
+# setopt hist_ignore_all_dups     # delete old duplicates
 setopt hist_ignore_space        # ignore commands starting with space
 setopt hist_reduce_blanks       # remove superfluous blanks
-setopt hist_save_no_dups        # don't save duplicates
+# setopt hist_save_no_dups        # don't save duplicates
 setopt sharehistory             # share history across sessions
 
 set -o vi # see also: zvm (vi mode plugin)
