@@ -1,5 +1,9 @@
-lazygit
-lazygit.tar.gz
-dotnet-install.sh
 .envrc
 .idea
+
+*.bak
+*\.bak*
+
+dotnet-install.sh
+lazygit
+lazygit.tar.gz
