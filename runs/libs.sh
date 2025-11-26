@@ -45,6 +45,8 @@ sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iosta
 brew install asciinema
 brew tap philocalyst/tap && brew install caligula
 brew install cbonsai croc eza git-delta grex llama.cpp ncdu syncthing w3m
+brew install opencode # ai stuff
+brew install texlive # LaTeX
 
 cargo install --jobs=4 bat gping impala navi tealdeer tokei yazi-cli zoxide
 cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
@@ -55,7 +57,12 @@ go install github.com/charmbracelet/glow@latest
 go install github.com/charmbracelet/vhs@latest
 go install github.com/cheat/cheat/cmd/cheat@latest
 
-uv tool install htpie marimo pre-commit  # Installed 3 executables: http, httpie, https  #  $ unbuffer http https://example.com | sponge | bat
+uv tool install htpie  # Installed 3 executables: http, httpie, https  #  $ unbuffer http https://example.com | sponge | bat
+uv tool install marimo
+uv tool install organize-tool
+#     $ crontab -e
+#         Add: 0 */6 * * * cd ~ && organize run
+uv tool install pre-commit
 
 #-------------------------------------------------
 # UI/UX
