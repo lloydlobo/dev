@@ -47,6 +47,9 @@ brew tap philocalyst/tap && brew install caligula
 brew install cbonsai croc eza git-delta grex llama.cpp ncdu syncthing w3m
 brew install opencode # ai stuff
 brew install texlive # LaTeX
+brew install pandoc # univeral markup converter
+brew install hunspell # spellcheck
+brew install pngquant # like TinyPNG
 
 cargo install --jobs=4 bat gping impala navi tealdeer tokei yazi-cli zoxide
 cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
