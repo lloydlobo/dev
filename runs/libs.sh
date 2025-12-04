@@ -12,8 +12,9 @@ sudo apt -y update
 # ESSENTIALS
 #-------------------------------------------------
 sudo apt -y install build-essential libtool-bin python3-dev automake flex bison libglib2.0-dev
-sudo apt -y install git ripgrep pavucontrol xclip jq shutter python3-pip python3-venv
+sudo apt -y install git shellcheck pavucontrol xclip jq shutter python3-pip python3-venv
 sudo apt -y install moreutils
+sudo apt -y install emacs
 
 #-------------------------------------------------
 # COMPILERS
@@ -54,6 +55,17 @@ brew install pngquant # like TinyPNG
 cargo install --jobs=4 bat gping impala navi tealdeer tokei yazi-cli zoxide
 cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
 cargo install --jobs=4 --locked serpl
+
+# ripgrep
+sudo apt install -y libpcre2-dev pkg-config
+mkdir -p ~/Personal/ripgrep
+cd ~/Personal/ripgrep
+cargo clean
+cargo build --release --features 'pcre2'
+cargo install ripgrep
+sudo cp target/release/rg /usr/local/bin/
+export PATH=/usr/local/bin:$PATH
+rg --version
 
 go install github.com/air-verse/air@latest
 go install github.com/charmbracelet/glow@latest
