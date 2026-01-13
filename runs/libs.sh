@@ -75,6 +75,7 @@ go install github.com/cheat/cheat/cmd/cheat@latest
 uv tool install htpie  # Installed 3 executables: http, httpie, https  #  $ unbuffer http https://example.com | sponge | bat
 uv tool install marimo
 uv tool install organize-tool
+uv tool install rendercv[full]
 #     $ crontab -e
 #         Add: 0 */6 * * * cd ~ && organize run
 uv tool install pre-commit
