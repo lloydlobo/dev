@@ -205,4 +205,4 @@ addToPathFront $HOME/.local/scripts/
 # addToPathFront $HOME/Personal/sumneko/bin/
 addToPath $HOME/.cargo/bin/
 addToPathFront /usr/local/go/bin/
-
+# addToPathFront $HOME/.emacs.d/bin

@@ -107,6 +107,9 @@ zinit snippet OMZL::git.zsh
 zinit snippet https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/clipboard.zsh # clipcopy, clippaste
 zinit snippet https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/correction.zsh # e.g., alias mv='nocorrect mv'
 
+# NOTE: gitstatusd-linux is a helper daemon that makes your Git-aware terminal
+#       prompt fast by caching Git repository status. It’s part of modern prompts
+#       like Starship or Pure.
 zinit snippet OMZP::git
 zinit snippet OMZP::sudo
 zinit snippet OMZP::command-not-found
