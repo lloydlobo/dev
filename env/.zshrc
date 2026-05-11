@@ -161,6 +161,16 @@ setopt hist_reduce_blanks       # remove superfluous blanks
 # setopt hist_save_no_dups        # don't save duplicates
 setopt sharehistory             # share history across sessions
 
+# zsh: corrupt history file /home/user/.zsh_history
+# - Improper Shutdowns: Turning off your machine while the terminal is still active.
+# - Disk Space: If your drive hit 100% capacity, Zsh might have failed mid-write.
+# - Multi-Session Clashes: Occasionally, having too many terminal tabs open writing to the same file simultaneously can cause a "collision."
+# 1. Move the corrupted file (so we have a backup): mv ~/.zsh_history ~/.zsh_history_bad
+# 2. Recover the readable data: strings ~/.zsh_history_bad > ~/.zsh_history
+# 3. Reload the history: fc -R ~/.zsh_history
+# 4. Clean up (optional): If your terminal is back to normal, you can delete the bad file: rm ~/.zsh_history_bad
+# Pro Tip: To prevent this in the future, many users add setopt SHARE_HISTORY and setopt HIST_IGNORE_DUPS to their .zshrc file to help manage how Zsh handles these writes.
+
 set -o vi # see also: zvm (vi mode plugin)
 
 # - - - - - - - - - - - - - - - - - - - -
