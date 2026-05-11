@@ -27,6 +27,29 @@ sudo apt -y update
 sudo apt -y install antigravity
 
 #-------------------------------------------------
+# CursorAI
+#-------------------------------------------------
+
+# Add Cursor's GPG key
+curl -fsSL https://downloads.cursor.com/keys/anysphere.asc | gpg --dearmor | sudo tee /etc/apt/keyrings/cursor.gpg > /dev/null
+
+# Add the Cursor repository
+echo "deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/cursor.gpg] https://downloads.cursor.com/aptrepo stable main" | sudo tee /etc/apt/sources.list.d/cursor.list > /dev/null
+
+# Update and install
+sudo apt -y update
+sudo apt -y install cursor
+
+# #     Official .deb; on first launch Cursor adds its apt repo for future updates
+# #     https://cursor.com/en/downloads
+# CURSOR_DEB=$(mktemp /tmp/cursor_XXXXXX.deb)
+# # curl -fsSL "https://downloader.cursor.sh/linux/deb/x64" -o "$CURSOR_DEB"
+# curl -fsSL "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest" -o "$CURSOR_DEB"
+# sudo dpkg -i "$CURSOR_DEB"
+# sudo apt -y install -f
+# rm -f "$CURSOR_DEB"
+
+#-------------------------------------------------
 # VSCode
 #-------------------------------------------------
 
@@ -37,6 +60,29 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] http
 
 sudo apt -y update
 sudo apt -y install code
+
+#-------------------------------------------------
+# VSCodium
+#-------------------------------------------------
+
+#     FOSS version of VSCode
+wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg |
+    gpg --dearmor |
+    sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg
+echo 'deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg] https://download.vscodium.com/debs vscodium main' |
+    sudo tee /etc/apt/sources.list.d/vscodium.list
+sudo apt update && sudo apt install codium
+
+#-------------------------------------------------
+# Zed
+#-------------------------------------------------
+
+#     curl -f https://zed.dev/install.sh | sh
+#     ^
+#     | Zed: To run Zed from your terminal, you must add ~/.local/bin to your PATH
+#     |   Run:
+#     |      echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.zshrc
+#     |      source ~/.zshrc
 
 # --- Epilogue ---
 
