@@ -47,11 +47,27 @@ sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iosta
 brew install asciinema
 brew tap philocalyst/tap && brew install caligula
 brew install cbonsai croc eza git-delta grex llama.cpp ncdu syncthing w3m
-brew install opencode # ai stuff
 brew install texlive # LaTeX
 brew install pandoc # univeral markup converter
 brew install hunspell # spellcheck
 brew install pngquant # like TinyPNG
+
+brew install opencode # ai stuff
+
+# AI: Native installer (recommended — auto-updates, no Node.js required)
+# See: https://claude.com/product/claude-code
+curl -fsSL https://claude.ai/install.sh | bash
+
+# AI: Codex CLI (OpenAI)
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+
+# AI: Gemini CLI (Google) — free tier: 1K req/day, no credit card
+npm install -g @google/gemini-cli
+
+# AI: Aider — git-native pair programmer, BYOK
+uv tool install --force --python python3.12 --with pip aider-chat@latest
+
+# AI: opencode is already installed above via brew
 
 cargo install --jobs=4 bat gping impala navi tealdeer tokei yazi-cli zoxide
 cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
