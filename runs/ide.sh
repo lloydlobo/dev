@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# USAGE:
+#
+#   $ DEV_ENV=~/Personal/dev ./run.sh ide --dry
+#   $ DEV_ENV=~/Personal/dev ./run.sh ide
 
 # --- Prologue ---
 
@@ -40,15 +44,6 @@ echo "deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/cursor.gpg] https://down
 sudo apt -y update
 sudo apt -y install cursor
 
-# #     Official .deb; on first launch Cursor adds its apt repo for future updates
-# #     https://cursor.com/en/downloads
-# CURSOR_DEB=$(mktemp /tmp/cursor_XXXXXX.deb)
-# # curl -fsSL "https://downloader.cursor.sh/linux/deb/x64" -o "$CURSOR_DEB"
-# curl -fsSL "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest" -o "$CURSOR_DEB"
-# sudo dpkg -i "$CURSOR_DEB"
-# sudo apt -y install -f
-# rm -f "$CURSOR_DEB"
-
 #-------------------------------------------------
 # VSCode
 #-------------------------------------------------
@@ -77,7 +72,7 @@ sudo apt update && sudo apt install codium
 # Zed
 #-------------------------------------------------
 
-#     curl -f https://zed.dev/install.sh | sh
+curl -f https://zed.dev/install.sh | sh
 #     ^
 #     | Zed: To run Zed from your terminal, you must add ~/.local/bin to your PATH
 #     |   Run:
