@@ -1,147 +1,129 @@
 #!/usr/bin/env bash
 # USAGE:
-#
 #   $ DEV_ENV=~/Personal/dev ./run.sh libs --dry
 #   $ DEV_ENV=~/Personal/dev ./run.sh libs
-#
 set -euo pipefail
-
-sudo apt -y update
 
 #-------------------------------------------------
 # ESSENTIALS
 #-------------------------------------------------
-sudo apt -y install build-essential libtool-bin python3-dev automake flex bison libglib2.0-dev
-sudo apt -y install git shellcheck pavucontrol xclip jq shutter python3-pip python3-venv
-sudo apt -y install moreutils
-sudo apt -y install emacs
-sudo apt install postgresql # brew install postgresql # psql
+sudo apt -y update
+sudo apt -y install \
+    build-essential libtool-bin automake flex bison libglib2.0-dev \
+    python3-dev python3-pip python3-venv \
+    git shellcheck jq moreutils \
+    pavucontrol xclip shutter \
+    emacs postgresql
 
 #-------------------------------------------------
 # COMPILERS
 #-------------------------------------------------
-sudo apt -y install nasm
-sudo apt -y install clang
+sudo apt -y install nasm clang
 
 #-------------------------------------------------
 # PACKAGE MANAGERS
 #-------------------------------------------------
-# --- homebrew ---
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # homebrew prerequisites: build-essential gcc
 
-# --- uv ---
+# Homebrew (prerequisites: build-essential gcc)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
-if false; then uv self update; fi
+# uv self update
 
 #-------------------------------------------------
 # CONVENIENCE
 #-------------------------------------------------
-sudo apt -y install entr lnav plocate redshift rsibreak yt-dlp # redshift -PO 3600
-sudo apt -y install direnv timewarrior
+sudo apt -y install \
+    direnv timewarrior \
+    entr lnav plocate redshift rsibreak yt-dlp \
+    expect sysstat  # expect: unbuffer; sysstat: iostat
 
-sudo apt -y install expect  # https://core.tcl.tk/expect/        Provides: unbuffer
-sudo apt -y install sysstat # https://github.com/sysstat/sysstat Provides: iostat
+brew install \
+    asciinema cbonsai croc eza git-delta grex ncdu syncthing w3m \
+    texlive pandoc hunspell pngquant
 
-# -- sudo apt -y install 7zip poppler-utils fd-find imagemagick --
-
-brew install asciinema
 brew tap philocalyst/tap && brew install caligula
-brew install cbonsai croc eza git-delta grex llama.cpp ncdu syncthing w3m
-brew install texlive # LaTeX
-brew install pandoc # univeral markup converter
-brew install hunspell # spellcheck
-brew install pngquant # like TinyPNG
 
-brew install opencode # ai stuff
+# AI tools                                                                # run:
+brew install opencode                                                     # opencode
+curl -fsSL https://claude.ai/install.sh | bash                            # claude   — Claude Code
+npm install -g @openai/codex                                              # codex    — Codex CLI (OpenAI)
+npm install -g @google/gemini-cli                                         # gemini   — Gemini CLI (free tier: 1K req/day)
+curl -fsSL https://antigravity.google/cli/install.sh | bash               # agy      — AntiGravity CLI
+uv tool install --force --python python3.12 --with pip aider-chat@latest  # aider    — Aider
 
-# AI: Native installer (recommended — auto-updates, no Node.js required)
-# See: https://claude.com/product/claude-code
-curl -fsSL https://claude.ai/install.sh | bash
-
-# AI: Codex CLI (OpenAI)
-curl -fsSL https://chatgpt.com/codex/install.sh | sh
-
-# AI: Gemini CLI (Google) — free tier: 1K req/day, no credit card
-npm install -g @google/gemini-cli
-
-# AI: Aider — git-native pair programmer, BYOK
-uv tool install --force --python python3.12 --with pip aider-chat@latest
-
-# AI: opencode is already installed above via brew
-
+#-------------------------------------------------
+# RUST / CARGO
+#-------------------------------------------------
 cargo install --jobs=4 bat gping impala navi tealdeer tokei yazi-cli zoxide
-cargo install --jobs=4 --locked yazi-fm yazi-cli #  yazi additional dependencies:
+cargo install --jobs=4 --locked yazi-fm yazi-cli  # yazi additional dependencies
 cargo install --jobs=4 --locked serpl
 
-# ripgrep
-sudo apt install -y libpcre2-dev pkg-config
-mkdir -p ~/Personal/ripgrep
-cd ~/Personal/ripgrep
-cargo clean
-cargo build --release --features 'pcre2'
-cargo install ripgrep
-sudo cp target/release/rg /usr/local/bin/
+# ripgrep with PCRE2
+sudo apt -y install libpcre2-dev pkg-config
+(
+    mkdir -p ~/Personal/ripgrep && cd ~/Personal/ripgrep
+    cargo clean
+    cargo build --release --features 'pcre2'
+    cargo install ripgrep
+    sudo cp target/release/rg /usr/local/bin/
+)
 export PATH=/usr/local/bin:$PATH
 rg --version
 
+#-------------------------------------------------
+# GO
+#-------------------------------------------------
 go install github.com/air-verse/air@latest
 go install github.com/charmbracelet/glow@latest
 go install github.com/charmbracelet/vhs@latest
 go install github.com/cheat/cheat/cmd/cheat@latest
 
-uv tool install htpie  # Installed 3 executables: http, httpie, https  #  $ unbuffer http https://example.com | sponge | bat
+#-------------------------------------------------
+# UV TOOLS
+#-------------------------------------------------
+uv tool install htpie         # executables: http, httpie, https
 uv tool install marimo
-uv tool install organize-tool
+uv tool install organize-tool # crontab: 0 */6 * * * cd ~ && organize run
 uv tool install rendercv[full]
-#     $ crontab -e
-#         Add: 0 */6 * * * cd ~ && organize run
 uv tool install pre-commit
 
 #-------------------------------------------------
-# UI/UX
+# UI/UX & MEDIA
 #-------------------------------------------------
-sudo apt -y install feh xcowsay acpitool pinta  # pinta - for drawing and image editing
+sudo apt -y install \
+    feh xcowsay acpitool pinta \
+    x264 mpv ffmpeg evince
 
 #-------------------------------------------------
-# Media
+# DYNAMIC CODE ANALYSIS
 #-------------------------------------------------
-sudo apt -y install x264 mpv ffmpeg
-sudo apt -y install evince
+sudo apt -y install valgrind afl++ linux-tools-"$(uname -r)"
 
-#-------------------------------------------------
-# Dynamic code analysis
-#-------------------------------------------------
-sudo apt -y install valgrind afl++
-
-# --- perf ---
-sudo apt -y install linux-tools-"$(uname -r)"
-
-# Change these kernel variables to allow Perf to collect information
-# without root privileges.
-# Keep the settings across system reboots:
-#   - See [Kernel variables documentation](https://www.kernel.org/doc/Documentation/sysctl/kernel.txt)
-#   - See [Dynamic code analysis/Profiler](https://www.jetbrains.com/help/clion/cpu-profiler.html#Prerequisites)
-sudo sh -c 'echo kernel.perf_event_paranoid=1 >> /etc/sysctl.d/99-perf.conf'
-sudo sh -c 'echo kernel.kptr_restrict=0 >> /etc/sysctl.d/99-perf.conf'
-sudo sh -c 'sysctl --system'
+# Allow perf without root (persistent across reboots)
+# See: https://www.kernel.org/doc/Documentation/sysctl/kernel.txt
+sudo tee /etc/sysctl.d/99-perf.conf <<'EOF'
+kernel.perf_event_paranoid=1
+kernel.kptr_restrict=0
+EOF
+sudo sysctl --system
 
 #-------------------------------------------------
 # DIY
 #-------------------------------------------------
-if [[ ! -d "$HOME/Personal/fzf" ]]; then 
-    # Installs .fzf.bash .fzf.zsh in $HOME (Useful with ^R `$ (backward-search)`)
-    git clone git@github.com:junegunn/fzf.git "$HOME"/Personal/fzf
-    "$HOME"/Personal/fzf/install
+
+# fzf — installs .fzf.bash/.fzf.zsh; enables ^R backward-search
+if [[ ! -d "$HOME/Personal/fzf" ]]; then
+    git clone git@github.com:junegunn/fzf.git "$HOME/Personal/fzf"
+    "$HOME/Personal/fzf/install"
 fi
 
 #-------------------------------------------------
 # DOTNET EXTRAS
 #-------------------------------------------------
 dotnet tool install -g fantomas
-# ^
-# |  cat << \EOF >> ~/.bash_profile
-# |  # Add .NET Core SDK tools
-# |  export PATH="$PATH:/home/user/.dotnet/tools"
-# |  EOF
+# Add to ~/.bash_profile:
+#   export PATH="$PATH:$HOME/.dotnet/tools"
 
 # vim: filetype=zsh
