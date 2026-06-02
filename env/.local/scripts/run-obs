@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+flatpak kill com.discordapp.Discord
+
+sudo modprobe -r v4l2loopback
+
+sudo modprobe v4l2loopback \
+  video_nr=10 \
+  card_label="OBS Cam" \
+  exclusive_caps=1
+
+flatpak run com.obsproject.Studio
