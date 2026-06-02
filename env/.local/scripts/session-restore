@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+# Session restoration script for lnav, btop, and redshift
+# Usage: ./session-restore [start|stop]
+
+set -euo pipefail
+
+# Config
+SESSION_DIR="$HOME/.local/share/session-restore"
+LNAV_SESSION="$SESSION_DIR/lnav.session"
+BTOP_SESSION="$SESSION_DIR/btop.session"
+REDSHIFT_PID_FILE="$SESSION_DIR/redshift.pid"
+
+# Tools
+LNAV_CMD="lnav"
+BTOP_CMD="btop"
+REDSHIFT_CMD="redshift"
+
+# Helpers
+die() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+}
+
+require_cmd() {
+    command -v "$1" >/dev/null 2>&1 || die "Command '$1' not found"
+}
+
+setup_session_dir() {
+    mkdir -p "$SESSION_DIR"
+}
+
+save_lnav_session() {
+    if pgrep -f "$LNAV_CMD" >/dev/null; then
+        log "Saving lnav session"
+        # lnav doesn't have built-in session save, so we save current files
+        local current_files=$(pgrep -f "$LNAV_CMD" | xargs -I {} ps -p {} -o args= | grep -o '\[^ ]*\.log\]' 2>/dev/null || echo "")
+        echo "$current_files" > "$LNAV_SESSION"
+    fi
+}
+
+restore_lnav_session() {
+    if [[ -f "$LNAV_SESSION" ]] && [[ -s "$LNAV_SESSION" ]]; then
+        log "Restoring lnav session"
+        local files=$(cat "$LNAV_SESSION")
+        if [[ -n "$files" ]]; then
+            nohup "$LNAV_CMD" $files >/dev/null 2>&1 &
+        fi
+    fi
+}
+
+save_btop_session() {
+    if pgrep -f "$BTOP_CMD" >/dev/null; then
+        log "Saving btop session"
+        # btop saves config automatically, just note it was running
+        echo "running" > "$BTOP_SESSION"
+    fi
+}
+
+restore_btop_session() {
+    if [[ -f "$BTOP_SESSION" ]] && [[ "$(cat "$BTOP_SESSION")" == "running" ]]; then
+        log "Restoring btop session"
+        nohup "$BTOP_CMD" >/dev/null 2>&1 &
+    fi
+}
+
+save_redshift_session() {
+    if pgrep -f "$REDSHIFT_CMD" >/dev/null; then
+        log "Saving redshift session"
+        pgrep -f "$REDSHIFT_CMD" > "$REDSHIFT_PID_FILE"
+    fi
+}
+
+restore_redshift_session() {
+    if [[ -f "$REDSHIFT_PID_FILE" ]] && [[ -s "$REDSHIFT_PID_FILE" ]]; then
+        log "Restoring redshift session"
+        nohup "$REDSHIFT_CMD" >/dev/null 2>&1 &
+    fi
+}
+
+save_sessions() {
+    log "Saving current sessions"
+    setup_session_dir
+    save_lnav_session
+    save_btop_session
+    save_redshift_session
+}
+
+restore_sessions() {
+    log "Restoring saved sessions"
+    setup_session_dir
+    restore_lnav_session
+    restore_btop_session
+    restore_redshift_session
+}
+
+stop_sessions() {
+    log "Stopping all sessions"
+    pkill -f "$LNAV_CMD" || true
+    pkill -f "$BTOP_CMD" || true
+    pkill -f "$REDSHIFT_CMD" || true
+    rm -f "$REDSHIFT_PID_FILE"
+}
+
+# Main
+main() {
+    local action="${1:-restore}"
+    
+    case "$action" in
+        save)
+            save_sessions
+            ;;
+        restore)
+            restore_sessions
+            ;;
+        stop)
+            stop_sessions
+            ;;
+        *)
+            echo "Usage: $0 [save|restore|stop]"
+            exit 1
+            ;;
+    esac
+}
+
+# Check for required commands
+for cmd in "$LNAV_CMD" "$BTOP_CMD" "$REDSHIFT_CMD"; do
+    if command -v "$cmd" >/dev/null 2>&1; then
+        require_cmd "$cmd"
+    else
+        log "Warning: $cmd not found, skipping"
+    fi
+done
+
+main "$@"

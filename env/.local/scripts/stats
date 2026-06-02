@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# Stats script to analyze shell history entries
+# Usage: ./stats [pattern]
+
+set -euo pipefail
+
+# Config
+HISTFILE="${HISTFILE:-$HOME/.zsh_history}"
+TEMP_FILE="/tmp/stats_parsed_$$"
+
+# Cleanup
+cleanup() {
+    [[ -f "$TEMP_FILE" ]] && rm -f "$TEMP_FILE"
+}
+trap cleanup EXIT
+
+# Helpers
+die() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+parse_history() {
+    local hist_file="$1"
+    
+    if [[ ! -f "$hist_file" ]]; then
+        die "History file not found: $hist_file"
+    fi
+    
+    echo "Parsing history file: $hist_file"
+    
+    # Parse zsh history format (timestamp:duration;command)
+    if [[ "$hist_file" == *".zsh_history" ]]; then
+        sed 's/^: [0-9]*:[0-9]*;//' "$hist_file" > "$TEMP_FILE"
+    # Parse bash history format
+    else
+        cp "$hist_file" "$TEMP_FILE"
+    fi
+    
+    echo "Total commands: $(wc -l < "$TEMP_FILE")"
+}
+
+show_stats() {
+    local pattern="${1:-}"
+    
+    if [[ -n "$pattern" ]]; then
+        echo "Filtering by pattern: $pattern"
+        grep -i "$pattern" "$TEMP_FILE" > "${TEMP_FILE}.filtered"
+        mv "${TEMP_FILE}.filtered" "$TEMP_FILE"
+    fi
+    
+    echo ""
+    echo "=== Command Statistics ==="
+    
+    # Top 10 most used commands
+    echo ""
+    echo "Top 10 commands:"
+    awk '{print $1}' "$TEMP_FILE" | sort | uniq -c | sort -nr | head -10
+    
+    # Command count by hour
+    echo ""
+    echo "Commands by first word frequency:"
+    awk '{print $1}' "$TEMP_FILE" | sort | uniq -c | sort -nr | head -20
+    
+    # Unique commands
+    echo ""
+    echo "Unique commands: $(awk '{print $1}' "$TEMP_FILE" | sort -u | wc -l)"
+}
+
+# Main
+main() {
+    local pattern="${1:-}"
+    
+    parse_history "$HISTFILE"
+    show_stats "$pattern"
+}
+
+main "$@"
