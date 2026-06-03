@@ -343,6 +343,9 @@ mode "$mode_redshift" {
 # See https://i3wm.org/docs/userguide.html#_scratchpad
 # Make the currently focused window a scratchpad
 bindsym $mod+Shift+minus move scratchpad
+# One related binding that's useful for video popouts:
+# bindsym $mod+Shift+p move scratchpad
+# --- same as ---
 # Show the first scratchpad window
 bindsym $mod+minus scratchpad show
 # Show the sup-mail scratchpad window, if any.
@@ -464,3 +467,15 @@ bindsym $mod+n bar mode toggle
 bindsym $mod+b bar mode hide                    #::: bindsym $mod+b bar mode hide bar-1
 # Set the bar instance with id 'bar-1' to always stay hidden
 bindsym $mod+Shift+b bar mode invisible         #::: bindsym $mod+Shift+b bar mode invisible bar-1
+
+# Toggle sticky on the focused window.
+# Useful for Discord lobby/video popouts.
+#
+# Workflow:
+#   Focus popout
+#   Mod+p
+#
+# Related:
+#   Mod+Shift+-  -> move window to scratchpad
+#   Mod+-        -> show/hide scratchpad
+bindsym $mod+p sticky toggle
