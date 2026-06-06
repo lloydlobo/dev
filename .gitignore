@@ -7,3 +7,4 @@
 dotnet-install.sh
 lazygit
 lazygit.tar.gz
+.aider*

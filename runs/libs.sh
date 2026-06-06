@@ -46,15 +46,35 @@ brew install \
 brew tap philocalyst/tap && brew install caligula
 
 # AI tools                                                                # run:
-brew install opencode                                                     # opencode
+#
+npm install -g opencode-ai                                                # opencode
+# curl -fsSL https://opencode.ai/install | bash                             # opencode
 curl -fsSL https://claude.ai/install.sh | bash                            # claude   — Claude Code
 npm install -g @openai/codex                                              # codex    — Codex CLI (OpenAI)
-npm install -g @google/gemini-cli                                         # gemini   — Gemini CLI (free tier: 1K req/day)
+# npm install -g @google/gemini-cli                                         # gemini   — Gemini CLI (free tier: 1K req/day)
 curl -fsSL https://antigravity.google/cli/install.sh | bash               # agy      — AntiGravity CLI
 uv tool install --force --python python3.12 --with pip aider-chat@latest  # aider    — Aider
+curl -fsSL https://ollama.com/install.sh | sh                             # ollama   — Ollama (Pull the model: ollama pull qwen2.5:7b; Start Ollama: ollama serve)
+# npm install -g @kilocode/cli                                              # kilo     — Kilo Code
+# curl -fsSL https://kilo.ai/cli/install | bash                             # kilo     — Kilo Code
 
 # AI tooling
 npm install -g llm-checker
+# npm i -g openclaw@latest # openclaw onboard
+
+# AI plugins
+#
+# caveman plugin → ~/.config/opencode/plugins/caveman/ + commands/{caveman,commit,review}.md
+# BROKEN: installer skip caveman-compress.md. Patch = cat > ~/.config/opencode/commands/caveman-compress.md with frontmatter+body.
+# Triggers: "caveman mode" | "be brief" | /caveman. Levels: lite|full|ultra|wenyan*. Off: /caveman off
+# Verify:  node --check ~/.config/opencode/plugins/caveman/plugin.js
+# Remove:  npx -y github:JuliusBrussee/caveman -- --uninstall
+# Caveat:  cavecrew agent schema broken in opencode (tools: vs permission:). No statusline slot.
+#
+# curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash # caveman for macOS / Linux / WSL / Git Bash
+# npm i -g @juliusbrussee/caveman-code
+mkdir -p ~/.config/opencode/commands
+npx -y github:JuliusBrussee/caveman
 
 #-------------------------------------------------
 # RUST / CARGO
