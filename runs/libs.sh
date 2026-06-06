@@ -53,6 +53,9 @@ npm install -g @google/gemini-cli                                         # gemi
 curl -fsSL https://antigravity.google/cli/install.sh | bash               # agy      — AntiGravity CLI
 uv tool install --force --python python3.12 --with pip aider-chat@latest  # aider    — Aider
 
+# AI tooling
+npm install -g llm-checker
+
 #-------------------------------------------------
 # RUST / CARGO
 #-------------------------------------------------
