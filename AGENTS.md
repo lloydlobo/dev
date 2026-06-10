@@ -54,7 +54,7 @@ DEV_ENV="$PWD" ./run.sh libs --dry  # filter by substring
 
 ## Things an agent is likely to get wrong
 
-- Treating as project and running `npm test` / `cargo test` / looking for `src/`. There is none. `package.json` is empty `{}`.
+- Treating as project and running `npm test` / `cargo test` / looking for `src/`.
 - Running `runs/*.sh` unguarded — network + `sudo`.
 - Adding files at repo root when content belongs in `env/` or `runs/`.
 - Reading working-tree files and assuming they match `HEAD` (3 files currently modified).

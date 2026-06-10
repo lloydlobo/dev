@@ -45,34 +45,51 @@ brew install \
 
 brew tap philocalyst/tap && brew install caligula
 
+# Local AI
+#
+curl -fsSL https://ollama.com/install.sh | sh                             # ollama   — Ollama (Pull the model: ollama pull qwen2.5:7b; Start Ollama: ollama serve)
+# NAME                                 ID              SIZE      MODIFIED      
+# llama3.2:1b                          baf6a787fdff    1.3 GB    8 minutes ago    
+# qwen2.5:0.5b-base-q4_1               50cc344abeb2    374 MB    21 hours ago     
+# qwen2.5:0.5b-base                    24c564a74dea    397 MB    21 hours ago     
+# phi:latest                           e2fd6321a5fe    1.6 GB    23 hours ago     
+# tinyllama:latest                     2644915ede35    637 MB    23 hours ago     
+# llama3.2:3b                          a80c4f17acd5    2.0 GB    47 hours ago     
+# nomic-embed-text:latest              0a109f422b47    274 MB    2 days ago       
+# all-minilm:l6-v2                     1b226e2802db    45 MB     2 days ago       
+# yarn-llama2:latest                   75df67be3cee    3.8 GB    2 days ago       
+# llama3.1:8b                          46e0c10c039e    4.9 GB    2 days ago       
+# qwen2.5-coder:7b-base-q8_0           a7b028fab948    8.1 GB    2 days ago       
+# granite3.1-moe:3b-instruct-q3_K_M    216dcd8f0222    1.6 GB    2 days ago       
+# qwen2.5:1.5b-instruct                65ec06548149    986 MB    2 days ago       
+# qwen3.5:2b                           324d162be6ca    2.7 GB    4 days ago       
+# qwen2.5:7b                           845dbda0ea48    4.7 GB    6 days ago       
+# llama3.2:latest                      a80c4f17acd5    2.0 GB    2 weeks ago      
+
 # AI tools                                                                # run:
 #
 npm install -g opencode-ai                                                # opencode
-# curl -fsSL https://opencode.ai/install | bash                             # opencode
 curl -fsSL https://claude.ai/install.sh | bash                            # claude   — Claude Code
 npm install -g @openai/codex                                              # codex    — Codex CLI (OpenAI)
-# npm install -g @google/gemini-cli                                         # gemini   — Gemini CLI (free tier: 1K req/day)
 curl -fsSL https://antigravity.google/cli/install.sh | bash               # agy      — AntiGravity CLI
 uv tool install --force --python python3.12 --with pip aider-chat@latest  # aider    — Aider
-curl -fsSL https://ollama.com/install.sh | sh                             # ollama   — Ollama (Pull the model: ollama pull qwen2.5:7b; Start Ollama: ollama serve)
-# npm install -g @kilocode/cli                                              # kilo     — Kilo Code
-# curl -fsSL https://kilo.ai/cli/install | bash                             # kilo     — Kilo Code
+npm install -g --ignore-scripts @earendil-works/pi-coding-agent           # pi       — pi.dev
 
 # AI tooling
 npm install -g llm-checker
 # npm i -g openclaw@latest # openclaw onboard
 
 # AI plugins
-#
+npx skills add vercel-labs/agent-skills
 # caveman plugin → ~/.config/opencode/plugins/caveman/ + commands/{caveman,commit,review}.md
-# BROKEN: installer skip caveman-compress.md. Patch = cat > ~/.config/opencode/commands/caveman-compress.md with frontmatter+body.
-# Triggers: "caveman mode" | "be brief" | /caveman. Levels: lite|full|ultra|wenyan*. Off: /caveman off
-# Verify:  node --check ~/.config/opencode/plugins/caveman/plugin.js
-# Remove:  npx -y github:JuliusBrussee/caveman -- --uninstall
-# Caveat:  cavecrew agent schema broken in opencode (tools: vs permission:). No statusline slot.
+#     BROKEN: installer skip caveman-compress.md. Patch = cat > ~/.config/opencode/commands/caveman-compress.md with frontmatter+body.
+#     Triggers: "caveman mode" | "be brief" | /caveman. Levels: lite|full|ultra|wenyan*. Off: /caveman off
+#     Verify:  node --check ~/.config/opencode/plugins/caveman/plugin.js
+#     Remove:  npx -y github:JuliusBrussee/caveman -- --uninstall
+#     Caveat:  cavecrew agent schema broken in opencode (tools: vs permission:). No statusline slot.
 #
-# curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash # caveman for macOS / Linux / WSL / Git Bash
-# npm i -g @juliusbrussee/caveman-code
+#     curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash # caveman for macOS / Linux / WSL / Git Bash
+#     npm i -g @juliusbrussee/caveman-code
 mkdir -p ~/.config/opencode/commands
 npx -y github:JuliusBrussee/caveman
 
