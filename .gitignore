@@ -8,3 +8,6 @@ dotnet-install.sh
 lazygit
 lazygit.tar.gz
 .aider*
+
+# archive — experiment scripts, scratch notes, binaries
+archive/
