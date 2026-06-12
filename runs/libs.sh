@@ -36,7 +36,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 #-------------------------------------------------
 sudo apt -y install \
     direnv timewarrior \
-    entr lnav plocate redshift rsibreak timeshift yt-dlp \
+    entr lnav plocate redshift rsibreak timeshift yad yt-dlp \
     expect sysstat  # expect: unbuffer; sysstat: iostat
 
 brew install \
