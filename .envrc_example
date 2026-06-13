@@ -1,1 +1,5 @@
 ./env/.local/scripts/stats
+
+if [ -n "$TMUX" ] && ! tmux list-windows -F '#{window_name}' | grep -Fq "foo|bar"; then
+  tmux new-window -d -n "foo|bar" -c "$PWD"
+fi
