@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+#
+# bat-progress
+# -------------
+# Lists files in a directory (git-aware if inside repo),
+# renders each file using `bat`, and optionally shows a
+# yad progress bar based on file count.
+#
+# Features:
+#   - Git-aware file listing (.gitignore respected)
+#   - Fallback to find in non-git directories
+#   - Optional yad UI with auto-close
+#   - FIFO-based progress stream (stable UI)
+#
+# Dependencies:
+#   - bash
+#   - bat
+#   - yad (optional)
+#   - git (optional, for git-aware mode)
+#   - find, wc, sort
+
+set -euo pipefail
+
+dir="${dir:-.}"
+
+# TODO: Add to i3 config
+#         for_window [title="bat-progress"] floating enable
+#         for_window [title="bat-progress"] resize set 500 120
+#         for_window [title="bat-progress"] move position center
+#       And use `--title``
+#         yad --progress \
+#            --title="bat-progress" \
+#            --text="Processing files..."
+use_ui="${use_ui:-true}"
+auto_close="${auto_close:-true}"
+
+i=0
+ui_pid=""
+fifo="/tmp/bat_progress_fifo_$$"
+
+cleanup() {
+  rm -f "$fifo"
+}
+trap cleanup EXIT
+
+mkfifo "$fifo"
+
+# -------------------------
+# File source selection
+# -------------------------
+if git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  files_cmd=(git -C "$dir" ls-files -z --cached --others --exclude-standard)
+  total=$(git -C "$dir" ls-files --cached --others --exclude-standard | wc -l)
+else
+  files_cmd=(find "$dir" -type f -print0)
+  total=$(find "$dir" -type f | wc -l)
+fi
+
+# -------------------------
+# Start UI
+# -------------------------
+if $use_ui; then
+  (
+    args=(--progress --text="Processing files...")
+    $auto_close && args+=(--auto-close)
+    yad "${args[@]}" < "$fifo"
+  ) &
+  ui_pid=$!
+fi
+
+exec 3>"$fifo"
+
+# -------------------------
+# Main loop
+# -------------------------
+"${files_cmd[@]}" |
+sort -z |
+while IFS= read -r -d '' f; do
+  bat "$dir/$f"
+  i=$((i + 1))
+  echo $(( i * 100 / total )) >&3
+done
+
+exec 3>&-
+
+# -------------------------
+# Cleanup UI
+# -------------------------
+if [ -n "${ui_pid:-}" ]; then
+  wait "$ui_pid" 2>/dev/null || true
+fi
