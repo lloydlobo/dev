@@ -1,0 +1,504 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+readonly API_BASE="https://api.exa.ai"
+readonly DEFAULT_CONFIG="${HOME}/.exa/config"
+readonly PROGNAME="exa"
+
+if [ -t 1 ]; then
+  readonly BOLD='\033[1m' DIM='\033[2m' GREEN='\033[32m'
+  readonly YELLOW='\033[33m' CYAN='\033[36m' RESET='\033[0m'
+else
+  readonly BOLD='' DIM='' GREEN='' YELLOW='' CYAN='' RESET=''
+fi
+
+die() { echo -e "${BOLD}error:${RESET} $*" >&2; exit 1; }
+warn() { echo -e "${YELLOW}warn:${RESET} $*" >&2; }
+
+usage() {
+  cat <<EOF
+usage: ${PROGNAME} [global opts] <command> [cmd opts] [args...]
+
+commands:
+  search [opts] <query>   Web search (default when no command given)
+  contents [opts] <url>   Get content for known URLs
+  answer [opts] <query>   Grounded question answering
+  config                  Show config status
+
+global options:
+  --raw                   Raw JSON output
+  -i, --interactive       Interactive fzf picker
+  --config FILE           Config file path (default: ~/.exa/config)
+  -h, --help              Show this help
+  --version               Show version
+
+search options:
+  --type TYPE             auto|fast|instant|deep-lite|deep|deep-reasoning (default: auto)
+  -n, --num N             Number of results (default: 10)
+  --include DOM           Include domain (repeatable)
+  --exclude DOM           Exclude domain (repeatable)
+  --max-age HOURS         Max age of cached content in hours
+  --text                  Include full page text
+  --text-limit N          Max characters for text (default: 20000)
+  --summary               Include per-result summary
+  --summary-query TEXT    Bias summary toward question
+  --no-highlights         Disable highlights
+  --schema JSON           outputSchema for structured extraction
+  --system-prompt TEXT    System prompt for synthesis
+
+contents options:
+  --text                  Get full text (default: highlights)
+  --text-limit N          Max characters for text (default: 20000)
+  --summary               Get per-result summary
+  --summary-query TEXT    Bias summary toward question
+  --no-highlights         Disable highlights
+  --max-age HOURS         Freshness threshold in hours
+
+answer options:
+  --type TYPE             auto|fast|instant|deep-lite|deep|deep-reasoning (default: auto)
+
+examples:
+  ${PROGNAME} "rust async patterns"
+  ${PROGNAME} search --type deep "quantum computing"
+  ${PROGNAME} search --include arxiv.org --num 5 "LLM alignment"
+  ${PROGNAME} search --schema '{"type":"object","properties":{"name":{"type":"string"}}}' "companies"
+  ${PROGNAME} contents https://example.com
+  ${PROGNAME} answer "what is tail call optimization?"
+  ${PROGNAME} --raw search "docker compose"
+EOF
+}
+
+version() { echo "${PROGNAME} 0.1.0"; }
+
+check_deps() {
+  command -v curl >/dev/null 2>&1 || die "curl required"
+  command -v jq   >/dev/null 2>&1 || die "jq required (install: apt install jq)"
+}
+
+load_config() {
+  local config_file="${global_config:-$DEFAULT_CONFIG}"
+  if [ -f "$config_file" ]; then
+    source "$config_file"
+  fi
+  if [ -z "${EXA_API_KEY:-}" ]; then
+    die "EXA_API_KEY not set. Create ${config_file} with: ${BOLD}EXA_API_KEY=sk-...${RESET}"
+  fi
+}
+
+# ---- API calls ----
+
+exa_api() {
+  local endpoint="$1" data="$2"
+  local response
+  response=$(curl -sS "${API_BASE}${endpoint}" \
+    -H "x-api-key: ${EXA_API_KEY}" \
+    -H "content-type: application/json" \
+    -d "$data") || return $?
+  local err
+  err=$(echo "$response" | jq -r '.error // empty')
+  [ -n "$err" ] && { echo "API error: $err" >&2; return 1; }
+  echo "$response"
+}
+
+# ---- JSON payload builders ----
+
+build_search_body() {
+  local query="$1"
+  local payload
+  payload=$(jq -n \
+    --arg q "$query" \
+    --arg t "${search_type:-auto}" \
+    --argjson n "${search_num:-10}" \
+    '{query: $q, type: $t, numResults: $n}')
+
+  local contents="{}"
+  local has_contents=false
+
+  if [ "${search_highlights:-true}" = true ]; then
+    contents=$(echo "$contents" | jq '. + {highlights: true}')
+    has_contents=true
+  fi
+
+  if [ -n "${search_text:-}" ]; then
+    local mcl="${search_text_limit:-20000}"
+    contents=$(echo "$contents" | jq --argjson m "$mcl" '. + {text: {maxCharacters: $m}}')
+    has_contents=true
+  fi
+
+  if [ -n "${search_summary:-}" ]; then
+    if [ -n "${search_summary_query:-}" ]; then
+      contents=$(echo "$contents" | jq --arg q "$search_summary_query" '. + {summary: {query: $q}}')
+    else
+      contents=$(echo "$contents" | jq '. + {summary: true}')
+    fi
+    has_contents=true
+  fi
+
+  if [ -n "${search_max_age:-}" ]; then
+    contents=$(echo "$contents" | jq --argjson h "$search_max_age" '. + {maxAgeHours: $h}')
+    has_contents=true
+  fi
+
+  $has_contents && payload=$(echo "$payload" | jq --argjson c "$contents" '. + {contents: $c}')
+
+  if [ ${#search_include[@]} -gt 0 ]; then
+    local arr
+    arr=$(printf '%s\n' "${search_include[@]}" | jq -R . | jq -s .)
+    payload=$(echo "$payload" | jq --argjson d "$arr" '. + {includeDomains: $d}')
+  fi
+
+  if [ ${#search_exclude[@]} -gt 0 ]; then
+    local arr
+    arr=$(printf '%s\n' "${search_exclude[@]}" | jq -R . | jq -s .)
+    payload=$(echo "$payload" | jq --argjson d "$arr" '. + {excludeDomains: $d}')
+  fi
+
+  if [ -n "${search_schema:-}" ]; then
+    payload=$(echo "$payload" | jq --argjson s "$search_schema" '. + {outputSchema: $s}')
+  fi
+
+  if [ -n "${search_system_prompt:-}" ]; then
+    payload=$(echo "$payload" | jq --arg s "$search_system_prompt" '. + {systemPrompt: $s}')
+  fi
+
+  echo "$payload"
+}
+
+build_contents_body() {
+  local -n urls_ref=$1
+  local body
+  body=$(printf '%s\n' "${urls_ref[@]}" | jq -R . | jq -s '{urls: .}')
+
+  if [ "${contents_highlights:-true}" = true ]; then
+    body=$(echo "$body" | jq '. + {highlights: true}')
+  fi
+
+  if [ -n "${contents_text:-}" ]; then
+    local mcl="${contents_text_limit:-20000}"
+    body=$(echo "$body" | jq --argjson m "$mcl" '. + {text: {maxCharacters: $m}}')
+  fi
+
+  if [ -n "${contents_summary:-}" ]; then
+    if [ -n "${contents_summary_query:-}" ]; then
+      body=$(echo "$body" | jq --arg q "$contents_summary_query" '. + {summary: {query: $q}}')
+    else
+      body=$(echo "$body" | jq '. + {summary: true}')
+    fi
+  fi
+
+  if [ -n "${contents_max_age:-}" ]; then
+    body=$(echo "$body" | jq --argjson h "$contents_max_age" '. + {maxAgeHours: $h}')
+  fi
+
+  echo "$body"
+}
+
+build_answer_body() {
+  local query="$1"
+  jq -n \
+    --arg q "$query" \
+    --arg t "${answer_type:-auto}" \
+    '{query: $q, type: $t}'
+}
+
+# ---- Output formatters ----
+
+output_terse_search() {
+  local json="$1"
+  local has_output
+  has_output=$(echo "$json" | jq 'has("output") and .output.content != null // false')
+
+  if [ "$has_output" = "true" ]; then
+    echo ""
+    echo -e "${BOLD}→ Structured output${RESET}"
+    echo "$json" | jq -r '.output.content' | sed 's/^/  /'
+    echo ""
+    echo -e "${DIM}Grounding available per field${RESET}"
+    echo ""
+  fi
+
+  local total query search_type
+  total=$(echo "$json" | jq -r '.results | length')
+  query=$(echo "$json" | jq -r '.query // ""')
+  search_type=$(echo "$json" | jq -r '.requestType // "auto"')
+
+  echo ""
+  echo -e "${BOLD}→ ${total} results for \"${query}\" (${search_type})${RESET}"
+  echo ""
+
+  echo "$json" | jq -r '
+    .results | to_entries[] |
+    "  \(.key + 1 | tostring). \(.value.title // "Untitled")\n     \(.value.url // "")\n" +
+    ([.value.highlights // [] | .[] | "     " + .] | join("\n"))
+  '
+}
+
+output_terse_contents() {
+  local json="$1"
+  echo ""
+  local total
+  total=$(echo "$json" | jq -r '.results | length // 0')
+  echo -e "${BOLD}→ ${total} URL(s)${RESET}"
+  echo ""
+  echo "$json" | jq -r '
+    .results | to_entries[] |
+    [
+      "  \(.key + 1 | tostring). \(.value.title // "Untitled")\n     \(.value.url // "")"
+    ] +
+    if (.value.highlights // []) | length > 0 then
+      [.value.highlights[] | "     " + .]
+    elif (.value.text // "") | length > 0 then
+      ["     " + .value.text[0:300]]
+    else
+      []
+    end |
+    join("\n")
+  '
+}
+
+output_terse_answer() {
+  local json="$1"
+  local answer
+  answer=$(echo "$json" | jq -r '.answer // empty')
+  [ -z "$answer" ] && { echo "No answer returned" >&2; return; }
+  echo ""
+  echo -e "${BOLD}→ Answer${RESET}"
+  echo ""
+  echo "$answer" | fold -s
+  echo ""
+  local citations
+  citations=$(echo "$json" | jq -r '.citations // [] | to_entries[] | "  \(.key+1). \(.value.title // "Source") (\(.value.url // ""))" // empty')
+  if [ -n "$citations" ]; then
+    echo ""
+    echo -e "${BOLD}Sources:${RESET}"
+    echo "$citations"
+  fi
+  echo ""
+}
+
+# ---- Interactive mode ----
+
+interactive_search() {
+  local json="$1"
+  local tmpdir
+  tmpdir=$(mktemp -d "/tmp/${PROGNAME}.XXXX")
+  trap 'rm -rf "$tmpdir"' EXIT
+
+  echo "$json" > "$tmpdir/resp.json"
+  local total
+  total=$(echo "$json" | jq -r '.results | length // 0')
+  [ "$total" -eq 0 ] && { echo "No results to browse" >&2; return; }
+
+  echo "$json" | jq -r '
+    .results | to_entries[] |
+    "\(.key)\t\(.value.title // "Untitled")\t\(.value.url // "")"
+  ' > "$tmpdir/items.tsv"
+
+  set +e
+  local selection
+  selection=$(fzf \
+    --delimiter="\t" \
+    --with-nth=2 \
+    --preview "jq -r '.results[{1}] | \"\\(.title // \"\")\n\\(.url // \"\")\n\n\" + ([.highlights // [] | .[0:5][] | \"▸ \" + .] | join(\"\n\"))' '$tmpdir/resp.json'" \
+    --preview-window=right:60%:wrap \
+    --bind "enter:execute-silent(xdg-open {3} >/dev/null 2>&1 || open {3} >/dev/null 2>&1)+abort" \
+    < "$tmpdir/items.tsv" \
+    2>/dev/null || true)
+  set -e
+
+  if [ -n "$selection" ]; then
+    local url
+    url=$(echo "$selection" | cut -f3)
+    [ -n "$url" ] && echo "→ $url" >&2
+  fi
+}
+
+# ---- Commands ----
+
+cmd_search() {
+  local args=()
+  search_type="auto"
+  search_num=10
+  search_highlights=true
+  search_text=""
+  search_text_limit=20000
+  search_summary=""
+  search_summary_query=""
+  search_max_age=""
+  search_schema=""
+  search_system_prompt=""
+  search_include=()
+  search_exclude=()
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --type) search_type="$2"; shift 2 ;;
+      -n|--num) search_num="$2"; shift 2 ;;
+      --include) search_include+=("$2"); shift 2 ;;
+      --exclude) search_exclude+=("$2"); shift 2 ;;
+      --max-age) search_max_age="$2"; shift 2 ;;
+      --text) search_text="true"; shift ;;
+      --text-limit) search_text_limit="$2"; shift 2 ;;
+      --summary) search_summary="true"; shift ;;
+      --summary-query) search_summary_query="$2"; shift 2 ;;
+      --no-highlights) search_highlights=false; shift ;;
+      --schema) search_schema="$2"; shift 2 ;;
+      --system-prompt) search_system_prompt="$2"; shift 2 ;;
+      -h|--help) usage; exit 0 ;;
+      --) shift; args+=("$@"); break ;;
+      -*) die "Unknown search flag: $1" ;;
+      *) args+=("$1"); shift ;;
+    esac
+  done
+
+  [ ${#args[@]} -eq 0 ] && die "search requires a query"
+  local query="${args[*]}"
+
+  local body
+  body=$(build_search_body "$query")
+  local json
+  json=$(exa_api "/search" "$body")
+
+  if [ "$global_raw" = true ]; then
+    echo "$json"
+    return
+  fi
+
+  if [ "$global_interactive" = true ]; then
+    interactive_search "$json"
+    return
+  fi
+
+  output_terse_search "$json"
+}
+
+cmd_contents() {
+  contents_highlights=true
+  contents_text=""
+  contents_text_limit=20000
+  contents_summary=""
+  contents_summary_query=""
+  contents_max_age=""
+  local urls=()
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --text) contents_text="true"; shift ;;
+      --text-limit) contents_text_limit="$2"; shift 2 ;;
+      --summary) contents_summary="true"; shift ;;
+      --summary-query) contents_summary_query="$2"; shift 2 ;;
+      --no-highlights) contents_highlights=false; shift ;;
+      --max-age) contents_max_age="$2"; shift 2 ;;
+      -h|--help) usage; exit 0 ;;
+      --) shift; urls+=("$@"); break ;;
+      -*) die "Unknown contents flag: $1" ;;
+      *) urls+=("$1"); shift ;;
+    esac
+  done
+
+  [ ${#urls[@]} -eq 0 ] && die "contents requires at least one URL"
+
+  local body
+  body=$(build_contents_body urls)
+  local json
+  json=$(exa_api "/contents" "$body")
+
+  if [ "$global_raw" = true ]; then
+    echo "$json"
+    return
+  fi
+
+  output_terse_contents "$json"
+}
+
+cmd_answer() {
+  answer_type="auto"
+  local args=()
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --type) answer_type="$2"; shift 2 ;;
+      -h|--help) usage; exit 0 ;;
+      --) shift; args+=("$@"); break ;;
+      -*) die "Unknown answer flag: $1" ;;
+      *) args+=("$1"); shift ;;
+    esac
+  done
+
+  [ ${#args[@]} -eq 0 ] && die "answer requires a query"
+  local query="${args[*]}"
+
+  local body
+  body=$(build_answer_body "$query")
+  local json
+  json=$(exa_api "/answer" "$body")
+
+  if [ "$global_raw" = true ]; then
+    echo "$json"
+    return
+  fi
+
+  output_terse_answer "$json"
+}
+
+cmd_config() {
+  local config_file="${global_config:-$DEFAULT_CONFIG}"
+  echo -e "${BOLD}${PROGNAME} config${RESET}"
+  echo ""
+  echo -e "  Config file: ${CYAN}${config_file}${RESET}"
+  if [ -f "$config_file" ]; then
+    echo -e "  Status:      ${GREEN}exists${RESET}"
+    echo ""
+    echo "  Contents:"
+    while IFS= read -r line; do
+      local sanitized
+      if [[ "$line" == EXA_API_KEY=* ]]; then
+        sanitized="EXA_API_KEY=sk-...${line: -4}"
+      else
+        sanitized="$line"
+      fi
+      echo "    ${DIM}${sanitized}${RESET}"
+    done < "$config_file"
+  else
+    echo -e "  Status:      ${YELLOW}not found${RESET}"
+    echo ""
+    echo "  Create it:"
+    echo "    ${DIM}echo 'EXA_API_KEY=sk-your-key-here' > ${config_file}${RESET}"
+  fi
+  echo ""
+  echo -e "  Default type: ${CYAN}${DEFAULT_TYPE:-auto}${RESET}"
+  echo -e "  Default num:  ${CYAN}${DEFAULT_NUM:-10}${RESET}"
+}
+
+# ---- Main ----
+
+global_raw=false
+global_interactive=false
+global_config=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --raw) global_raw=true; shift ;;
+    -i|--interactive) global_interactive=true; shift ;;
+    --config) global_config="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    --version) version; exit 0 ;;
+    search|contents|answer|config)
+      cmd="$1"; shift; break ;;
+    *)
+      cmd="search"; break ;;
+  esac
+done
+
+cmd="${cmd:-search}"
+
+check_deps
+load_config
+
+case "$cmd" in
+  search)   cmd_search "$@" ;;
+  contents) cmd_contents "$@" ;;
+  answer)   cmd_answer "$@" ;;
+  config)   cmd_config ;;
+esac
