@@ -45,6 +45,8 @@ brew install \
 
 brew tap philocalyst/tap && brew install caligula
 
+npm install -g @biomejs/biome # formatter
+
 # Local AI
 #
 curl -fsSL https://ollama.com/install.sh | sh                             # ollama   — Ollama (Pull the model: ollama pull qwen2.5:7b; Start Ollama: ollama serve)
