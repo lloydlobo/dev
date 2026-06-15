@@ -54,6 +54,11 @@ fi
 #
 mise use -g node@22 # https://mise.jdx.dev/lang/node.html#node - installs the latest version of node-20.x and makes it the global default
 
+#
+# bun
+#
+curl -fsSL https://bun.sh/install | bash
+
 #=================================================
 # Dogfooding
 #=================================================
