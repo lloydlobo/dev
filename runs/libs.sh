@@ -37,7 +37,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 sudo apt -y install \
     direnv timewarrior \
     entr lnav plocate redshift rsibreak timeshift yad yt-dlp \
-    expect sysstat  # expect: unbuffer; sysstat: iostat
+    expect sysstat screen  # expect: unbuffer; sysstat: iostat
 
 brew install \
     asciinema cbonsai croc eza git-delta grex ncdu syncthing w3m \
@@ -101,6 +101,7 @@ npx -y github:JuliusBrussee/caveman
 cargo install --jobs=4 bat gping impala navi tealdeer tokei yazi-cli zoxide
 cargo install --jobs=4 --locked yazi-fm yazi-cli  # yazi additional dependencies
 cargo install --jobs=4 --locked serpl
+cargo install --jobs=4 --locked hyperfine
 
 # ripgrep with PCRE2
 sudo apt -y install libpcre2-dev pkg-config
