@@ -11,8 +11,10 @@
 
 general {
         colors = true
-        interval = 5
+        interval = 2
 }
+
+order += "read_file net_speed"
 
 order += "load"
 order += "memory"
@@ -23,11 +25,9 @@ order += "cpu_temperature 0"
 order += "tztime local"
 order += "volume master"
 
-order += "read_file net_speed"
-
 # 1 CPU
 load {
-        format = "cpu %5min"
+        format = "cpu %1min"
 }
 
 # 2 MEM
@@ -61,7 +61,7 @@ volume master {
 
 cpu_temperature 0 {
         format = "T: %degrees °C"
-        path = "/sys/devices/platform/coretemp.0/hwmon/hwmon2/temp1_input"
+        path = "/sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input"
 }
 
 read_file net_speed {
