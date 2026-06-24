@@ -58,7 +58,8 @@ exec_always --no-startup-id bash -c 'i3-msg "[class=\"video-watch\"]" focus 2>/d
 exec_always --no-startup-id bash -c '~/.local/scripts/net-speed &'
 
 exec --no-startup-id rsibreak
-exec_always --no-startup-id redshift -P0 3600
+# exec_always --no-startup-id redshift -P0 3600
+exec_always --no-startup-id redshift -c ~/.config/redshift.conf
 
 # ==========================
 # VOLUME CONTROL (PulseAudio)
@@ -329,11 +330,22 @@ bindsym $mod+Shift+a mode "apps"
 # ==========================
 # redshift modes to make looking at screen bearable for longer times
 # See https://github.com/HarshalRathore/my-i3-config/blob/81559e692a7c4176890ac9f07ae1f24904c76cb8/.config/i3/config#L670C1-L685C2
+# ~/.config/redshift.conf
+#   [redshift]
+#   temp-day=5700
+#   temp-night=3600
+#   gamma=0.8
+#   adjustment-method=randr
+#   location-provider=manual
+#   [manual]
+#   lat=0.0 # ← update actual coordinate
+#   lon=0.0 # ← update actual coordinate
 bindsym $mod+Shift+d mode "$mode_redshift"
 set $mode_redshift Set colour temperature: (a)uto, (r)eset, (2)500K, (3)000K, (4)000K, (5)000K
 set $kill_redshift pkill -9 redshift;
 mode "$mode_redshift" {
-    bindsym a exec --no-startup-id "$kill_redshift redshift -P -t 5000:4000", mode "default"
+    # bindsym a exec --no-startup-id "$kill_redshift redshift -P -t 5000:4000", mode "default"
+    bindsym a exec --no-startup-id "$kill_redshift redshift -c ~/.config/redshift.conf", mode "default"
     bindsym r exec --no-startup-id "$kill_redshift redshift -x", mode "default"
     bindsym 2 exec --no-startup-id "$kill_redshift redshift -P -O 2500", mode "default"
     bindsym 3 exec --no-startup-id "$kill_redshift redshift -P -O 3000", mode "default"
