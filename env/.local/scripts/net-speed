@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+OUT="${2:-/tmp/net-speed}"
+INTERVAL=2
+
+detect_iface() {
+    awk 'NR > 2 {
+        gsub(/:$/, "", $1)
+        if ($1 !~ /^(lo|br-|docker|veth)/ && $2+0 > 0) { print $1; exit }
+    }' /proc/net/dev
+}
+
+IFACE="${1:-$(detect_iface)}"
+[[ -z "$IFACE" ]] && { echo "no active interface" >&2; exit 1; }
+
+read_bytes() {
+    awk -v iface="${IFACE}:" '$1 == iface { print $2, $10 }' /proc/net/dev
+}
+
+fmt_rate() { numfmt --to=iec "$(( $1 / INTERVAL ))"; }
+
+printf '↓0B/s  ↑0B/s\n' > "$OUT"
+
+prev_rx=0 prev_tx=0
+while true; do
+    read -r rx tx < <(read_bytes) || { sleep "$INTERVAL"; continue; }
+    if (( prev_rx > 0 )) && (( rx >= prev_rx && tx >= prev_tx )); then
+        printf '↓%sB/s  ↑%sB/s\n' \
+            "$(fmt_rate $(( rx - prev_rx )))" \
+            "$(fmt_rate $(( tx - prev_tx )))" > "$OUT"
+    fi
+    prev_rx=$rx prev_tx=$tx
+    sleep "$INTERVAL"
+done

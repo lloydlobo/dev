@@ -55,6 +55,7 @@ exec_always --no-startup-id bash -c 'i3-msg "[class=\"wezterm\"]" focus 2>/dev/n
 exec_always --no-startup-id bash -c 'i3-msg "[class=\"btop\"]" focus 2>/dev/null || wezterm start --class "btop" -- btop &>/dev/null &'
 exec_always --no-startup-id bash -c 'i3-msg "[class=\"lnav\"]" focus 2>/dev/null || wezterm start --class "lnav" -- lnav &>/dev/null &'
 exec_always --no-startup-id bash -c 'i3-msg "[class=\"video-watch\"]" focus 2>/dev/null || wezterm start --class "video-watch" -- watch -n1 '\''lsof /dev/video* 2>/dev/null | grep -E "COMMAND|obs|Discord"'\'' &>/dev/null &'
+exec_always --no-startup-id bash -c '~/.local/scripts/net-speed &'
 
 exec --no-startup-id rsibreak
 exec_always --no-startup-id redshift -P0 3600

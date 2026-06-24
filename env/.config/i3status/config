@@ -23,6 +23,8 @@ order += "cpu_temperature 0"
 order += "tztime local"
 order += "volume master"
 
+order += "read_file net_speed"
+
 # 1 CPU
 load {
         format = "cpu %5min"
@@ -60,4 +62,9 @@ volume master {
 cpu_temperature 0 {
         format = "T: %degrees °C"
         path = "/sys/devices/platform/coretemp.0/hwmon/hwmon2/temp1_input"
+}
+
+read_file net_speed {
+    format = "%content"
+    path = "/tmp/net-speed"
 }
