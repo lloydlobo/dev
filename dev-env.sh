@@ -4,6 +4,7 @@
 # Usage:
 #
 #	DEV_ENV=~/Personal/dev ./dev-env.sh --dry
+#	DEV_ENV="$PWD" ./dev-env.sh
 dry_run="0";
 
 if [[ -z "$XDG_CONFIG_HOME" ]]; then

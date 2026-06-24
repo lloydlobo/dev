@@ -49,7 +49,8 @@ exec --no-startup-id nm-applet
 
 # To check the reminder later: keep -s "wezterm"
 
-exec --no-startup-id vivaldi
+# exec --no-startup-id vivaldi
+exec --no-startup-id google-chrome
 exec_always --no-startup-id bash -c 'i3-msg "[class=\"wezterm\"]" focus 2>/dev/null || wezterm start &>/dev/null &'
 exec_always --no-startup-id bash -c 'i3-msg "[class=\"btop\"]" focus 2>/dev/null || wezterm start --class "btop" -- btop &>/dev/null &'
 exec_always --no-startup-id bash -c 'i3-msg "[class=\"lnav\"]" focus 2>/dev/null || wezterm start --class "lnav" -- lnav &>/dev/null &'
@@ -206,6 +207,7 @@ assign [class="wezterm"] $ws1
 assign [class="(?i)brave-browser"] $ws2
 assign [class="(?i)firefox"] $ws2
 assign [class="(?i)vivaldi"] $ws2
+assign [class="(?i)google-chrome"] $ws2
 assign [class="(?i)zen"] $ws2
 assign [class="codium"] $ws3
 assign [class="Org.gnome.Nautilus"] $ws4
@@ -280,7 +282,6 @@ mode "resize" {
 }
 
 bindsym $mod+r mode "resize"
-
 
 # ==========================
 # VOLUME CONTROL MODE
