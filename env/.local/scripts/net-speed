@@ -1,5 +1,27 @@
 #!/usr/bin/env bash
+# net-speed — background loop that samples /proc/net/dev and writes
+# download/upload rates to a temp file for i3status read_file display.
+#
+# Designed to be safe under exec_always: PID file singleton ensures at
+# most one instance runs per user, so i3 reload won't pile up duplicates.
+#
+# Usage:
+#   net-speed [interface] [output-file]
+#     interface   default: active (auto-detected, skips lo/br-/docker/veth)
+#     output-file default: /tmp/net-speed
+#
+#   net-speed &                                    # auto-detect, background
+#   net-speed wifi0 /tmp/net-speed &               # explicit interface
+#   sleep 3 && cat /tmp/net-speed                  # read current speed
+
 set -euo pipefail
+
+PIDFILE="/tmp/net-speed.pid"
+if [[ -f "$PIDFILE" ]] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+    exit 0
+fi
+trap 'rm -f "$PIDFILE"' EXIT
+echo "$$" > "$PIDFILE"
 
 OUT="${2:-/tmp/net-speed}"
 INTERVAL=2
