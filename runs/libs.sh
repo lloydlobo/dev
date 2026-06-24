@@ -128,7 +128,7 @@ go install github.com/cheat/cheat/cmd/cheat@latest
 #-------------------------------------------------
 uv tool install htpie         # executables: http, httpie, https
 uv tool install marimo
-uv tool install organize-tool # crontab: 0 */6 * * * cd ~ && organize run
+uv tool install organize-tool # crontab: 0 */6 * * * cd ~ && organize run # organize run --working-dir ~/Downloads
 uv tool install rendercv[full]
 uv tool install pre-commit
 uv tool install crawl4ai # crwl — Usage: crwl crawl [OPTIONS] URL. Crawl a website and extract content. Simple Usage: crwl crawl https://example.com

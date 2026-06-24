@@ -47,8 +47,13 @@ bindsym $mod+Shift+period exec systemctl suspend
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
+# To check the reminder later: keep -s "wezterm"
+
 exec --no-startup-id vivaldi
-exec --no-startup-id wezterm
+exec_always --no-startup-id bash -c 'i3-msg "[class=\"wezterm\"]" focus 2>/dev/null || wezterm start &>/dev/null &'
+exec_always --no-startup-id bash -c 'i3-msg "[class=\"btop\"]" focus 2>/dev/null || wezterm start --class "btop" -- btop &>/dev/null &'
+exec_always --no-startup-id bash -c 'i3-msg "[class=\"lnav\"]" focus 2>/dev/null || wezterm start --class "lnav" -- lnav &>/dev/null &'
+exec_always --no-startup-id bash -c 'i3-msg "[class=\"video-watch\"]" focus 2>/dev/null || wezterm start --class "video-watch" -- watch -n1 '\''lsof /dev/video* 2>/dev/null | grep -E "COMMAND|obs|Discord"'\'' &>/dev/null &'
 
 exec --no-startup-id rsibreak
 exec_always --no-startup-id redshift -P0 3600
@@ -207,10 +212,10 @@ assign [class="Org.gnome.Nautilus"] $ws4
 assign [class="jetbrains-toolbox"] $ws4
 assign [class="nautilus"] $ws4
 assign [class="TelegramDesktop"] $ws5
-assign [class="btop"] $ws0
-assign [class="lnav"] $ws0
-assign [class="gnome-terminal"] $ws0
-assign [class="i3-sensible-terminal"] $ws0
+assign [class="btop"] $ws10
+assign [class="lnav"] $ws10
+assign [class="gnome-terminal"] $ws10
+assign [class="i3-sensible-terminal"] $ws10
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
