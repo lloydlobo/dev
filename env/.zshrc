@@ -236,6 +236,21 @@ if (( $+commands[yazi] )); then
     }
 fi
 
+pushbin() {
+    [[ -n "$1" ]] || { echo "Usage: pushbin <command>" >&2; return 2; }
+
+    local bin
+    bin=$(command -v "$1") || { echo "pushbin: '$1' not found" >&2; return 1; }
+
+    pushd "$(dirname "$(realpath "$bin")")" || return
+}
+
+# Matching popbin/popd alias
+alias popbin=popd
+
+# TODO: move these exports to xprofile or something similar here
+export PATH="$HOME/.local/opt/android-studio/bin:$PATH"
+
 # TODO: Consider setopt autocd for easier navigation (typing a directory name auto-cds into it).
 
 # - - - - - - - - - - - - - - - - - - - -
